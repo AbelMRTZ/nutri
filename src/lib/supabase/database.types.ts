@@ -17,6 +17,135 @@ export type Database = {
   }
   public: {
     Tables: {
+      foods: {
+        Row: {
+          caffeine_mg: number | null
+          calcium_mg: number | null
+          carbs_g: number
+          category: Database["public"]["Enums"]["food_category"]
+          cholesterol_mg: number | null
+          created_at: string
+          energy_kcal: number
+          fat_g: number
+          fiber_g: number | null
+          id: string
+          iron_mg: number | null
+          magnesium_mg: number | null
+          monounsaturated_fat_g: number | null
+          name: string
+          omega3_g: number | null
+          phosphorus_mg: number | null
+          polyunsaturated_fat_g: number | null
+          potassium_mg: number | null
+          protein_g: number
+          salt_g: number | null
+          saturated_fat_g: number | null
+          serving_type: Database["public"]["Enums"]["food_serving_type"]
+          sodium_mg: number | null
+          sugar_g: number | null
+          updated_at: string
+          user_id: string
+          vitamin_a_mcg: number | null
+          vitamin_b1_mg: number | null
+          vitamin_b12_mcg: number | null
+          vitamin_b2_mg: number | null
+          vitamin_b3_mg: number | null
+          vitamin_b5_mg: number | null
+          vitamin_b6_mg: number | null
+          vitamin_b7_mcg: number | null
+          vitamin_b8_mcg: number | null
+          vitamin_c_mg: number | null
+          vitamin_d_mcg: number | null
+          vitamin_e_mcg: number | null
+          vitamin_k_mcg: number | null
+          zinc_mg: number | null
+        }
+        Insert: {
+          caffeine_mg?: number | null
+          calcium_mg?: number | null
+          carbs_g: number
+          category: Database["public"]["Enums"]["food_category"]
+          cholesterol_mg?: number | null
+          created_at?: string
+          energy_kcal: number
+          fat_g: number
+          fiber_g?: number | null
+          id?: string
+          iron_mg?: number | null
+          magnesium_mg?: number | null
+          monounsaturated_fat_g?: number | null
+          name: string
+          omega3_g?: number | null
+          phosphorus_mg?: number | null
+          polyunsaturated_fat_g?: number | null
+          potassium_mg?: number | null
+          protein_g: number
+          salt_g?: number | null
+          saturated_fat_g?: number | null
+          serving_type: Database["public"]["Enums"]["food_serving_type"]
+          sodium_mg?: number | null
+          sugar_g?: number | null
+          updated_at?: string
+          user_id: string
+          vitamin_a_mcg?: number | null
+          vitamin_b1_mg?: number | null
+          vitamin_b12_mcg?: number | null
+          vitamin_b2_mg?: number | null
+          vitamin_b3_mg?: number | null
+          vitamin_b5_mg?: number | null
+          vitamin_b6_mg?: number | null
+          vitamin_b7_mcg?: number | null
+          vitamin_b8_mcg?: number | null
+          vitamin_c_mg?: number | null
+          vitamin_d_mcg?: number | null
+          vitamin_e_mcg?: number | null
+          vitamin_k_mcg?: number | null
+          zinc_mg?: number | null
+        }
+        Update: {
+          caffeine_mg?: number | null
+          calcium_mg?: number | null
+          carbs_g?: number
+          category?: Database["public"]["Enums"]["food_category"]
+          cholesterol_mg?: number | null
+          created_at?: string
+          energy_kcal?: number
+          fat_g?: number
+          fiber_g?: number | null
+          id?: string
+          iron_mg?: number | null
+          magnesium_mg?: number | null
+          monounsaturated_fat_g?: number | null
+          name?: string
+          omega3_g?: number | null
+          phosphorus_mg?: number | null
+          polyunsaturated_fat_g?: number | null
+          potassium_mg?: number | null
+          protein_g?: number
+          salt_g?: number | null
+          saturated_fat_g?: number | null
+          serving_type?: Database["public"]["Enums"]["food_serving_type"]
+          sodium_mg?: number | null
+          sugar_g?: number | null
+          updated_at?: string
+          user_id?: string
+          vitamin_a_mcg?: number | null
+          vitamin_b1_mg?: number | null
+          vitamin_b12_mcg?: number | null
+          vitamin_b2_mg?: number | null
+          vitamin_b3_mg?: number | null
+          vitamin_b5_mg?: number | null
+          vitamin_b6_mg?: number | null
+          vitamin_b7_mcg?: number | null
+          vitamin_b8_mcg?: number | null
+          vitamin_c_mg?: number | null
+          vitamin_d_mcg?: number | null
+          vitamin_e_mcg?: number | null
+          vitamin_k_mcg?: number | null
+          zinc_mg?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -91,6 +220,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      food_category:
+        | "fruit"
+        | "vegetable"
+        | "fish"
+        | "meat"
+        | "grains_pasta"
+        | "nuts"
+        | "sweets"
+        | "beverages"
+        | "supplements"
+        | "other"
+      food_serving_type: "per_100g" | "per_unit"
       goal_type: "lose" | "maintain" | "gain"
       sex_type: "male" | "female"
     }
@@ -220,6 +361,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      food_category: [
+        "fruit",
+        "vegetable",
+        "fish",
+        "meat",
+        "grains_pasta",
+        "nuts",
+        "sweets",
+        "beverages",
+        "supplements",
+        "other",
+      ],
+      food_serving_type: ["per_100g", "per_unit"],
       goal_type: ["lose", "maintain", "gain"],
       sex_type: ["male", "female"],
     },

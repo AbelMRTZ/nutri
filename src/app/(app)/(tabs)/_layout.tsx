@@ -42,7 +42,10 @@ export default function TabsLayout() {
       }}>
       <Tabs.Screen name="index" options={{ title: 'Inicio', tabBarIcon: renderIcon('home-outline') }} />
       <Tabs.Screen name="calendario" options={{ title: 'Calendario', tabBarIcon: renderIcon('calendar-outline') }} />
-      <Tabs.Screen name="despensa" options={{ title: 'Despensa', tabBarIcon: renderIcon('nutrition-outline') }} />
+      <Tabs.Screen
+        name="despensa"
+        options={{ title: 'Despensa', tabBarIcon: renderIcon('nutrition-outline'), headerShown: false }}
+      />
       <Tabs.Screen
         name="entrenamiento"
         options={{ title: 'Entrenamiento', tabBarIcon: renderIcon('barbell-outline') }}

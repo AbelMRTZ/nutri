@@ -1,19 +1,12 @@
 import { Stack } from 'expo-router';
 
-import { AppFonts } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { useThemedStackScreenOptions } from '@/hooks/use-themed-stack-options';
 
 export default function AppLayout() {
-  const theme = useTheme();
+  const screenOptions = useThemedStackScreenOptions();
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: theme.background },
-        headerTintColor: theme.text,
-        headerTitleStyle: { fontFamily: AppFonts.heading, fontSize: 17 },
-        headerShadowVisible: false,
-      }}>
+    <Stack screenOptions={screenOptions}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="ajustes" options={{ presentation: 'modal', title: 'Ajustes' }} />
       <Stack.Screen name="cuenta" options={{ presentation: 'modal', title: 'Cuenta' }} />
