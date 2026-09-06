@@ -7,5 +7,15 @@ export { useFood } from './hooks/useFood';
 export { useCreateFood } from './hooks/useCreateFood';
 export { useUpdateFood } from './hooks/useUpdateFood';
 export { useDeleteFood } from './hooks/useDeleteFood';
-export { foodCategoryOptions, foodCategoryLabels, servingTypeOptions, servingTypeLabels } from './schema';
-export type { FoodFormValues } from './schema';
+export {
+  foodCategoryOptions,
+  foodCategoryLabels,
+  servingTypeOptions,
+  servingTypeLabels,
+  optionalNutrientFields,
+  nutrientLabels,
+} from './schema';
+export type { FoodFormValues, OptionalNutrientField } from './schema';
+export { calculateFoodContribution } from './calculations/contribution';
+export type { FoodContribution } from './calculations/contribution';
+

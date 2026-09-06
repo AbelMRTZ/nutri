@@ -12,7 +12,7 @@ export default function DespensaLayout() {
       <Stack.Screen name="alimentos/index" options={{ title: 'Alimentos' }} />
       <Stack.Screen name="alimentos/nuevo" options={{ title: 'Nuevo alimento' }} />
       <Stack.Screen name="alimentos/[id]" options={{ title: 'Editar alimento' }} />
-      <Stack.Screen name="comidas" options={{ title: 'Comidas' }} />
+      <Stack.Screen name="comidas" options={{ headerShown: false }} />
       <Stack.Screen name="planes" options={{ title: 'Planes' }} />
       <Stack.Screen name="investigar" options={{ title: 'Investigar Alimentos' }} />
     </Stack>

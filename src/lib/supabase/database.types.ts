@@ -146,6 +146,75 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_items: {
+        Row: {
+          created_at: string
+          food_id: string
+          id: string
+          is_variable: boolean
+          meal_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          food_id: string
+          id?: string
+          is_variable?: boolean
+          meal_id: string
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          food_id?: string
+          id?: string
+          is_variable?: boolean
+          meal_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_items_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_items_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meals: {
+        Row: {
+          category: Database["public"]["Enums"]["meal_category"]
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["meal_category"]
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["meal_category"]
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -233,6 +302,12 @@ export type Database = {
         | "other"
       food_serving_type: "per_100g" | "per_unit"
       goal_type: "lose" | "maintain" | "gain"
+      meal_category:
+        | "main"
+        | "breakfast"
+        | "pre_workout"
+        | "post_workout"
+        | "snack"
       sex_type: "male" | "female"
     }
     CompositeTypes: {
@@ -375,6 +450,13 @@ export const Constants = {
       ],
       food_serving_type: ["per_100g", "per_unit"],
       goal_type: ["lose", "maintain", "gain"],
+      meal_category: [
+        "main",
+        "breakfast",
+        "pre_workout",
+        "post_workout",
+        "snack",
+      ],
       sex_type: ["male", "female"],
     },
   },
