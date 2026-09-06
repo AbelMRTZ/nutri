@@ -1,6 +1,8 @@
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
+import { FieldLabel } from '@/components/field-label';
 import { ThemedText } from '@/components/themed-text';
+import { AppFonts } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type TextFieldProps = TextInputProps & {
@@ -14,13 +16,11 @@ export function TextField({ label, error, suffix, style, ...rest }: TextFieldPro
 
   return (
     <View style={styles.container}>
-      <ThemedText type="small" themeColor="textSecondary">
-        {label}
-      </ThemedText>
+      <FieldLabel>{label}</FieldLabel>
       <View
         style={[
           styles.inputRow,
-          { backgroundColor: theme.backgroundElement, borderColor: error ? theme.danger : 'transparent' },
+          { borderColor: error ? theme.danger : theme.border },
         ]}>
         <TextInput
           placeholderTextColor={theme.placeholder}
@@ -44,19 +44,20 @@ export function TextField({ label, error, suffix, style, ...rest }: TextFieldPro
 
 const styles = StyleSheet.create({
   container: {
-    gap: 6,
+    gap: 8,
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1.5,
     paddingHorizontal: 14,
   },
   input: {
     flex: 1,
     minHeight: 48,
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: AppFonts.body,
   },
 });

@@ -7,38 +7,58 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+/**
+ * "Vibrante / Enérgico" — the app's chosen design direction: near-black
+ * structural color, a coral accent for selection/attention states, and a
+ * lime accent reserved for progress/positive data visuals.
+ */
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    primary: '#2F6F4F',
-    onPrimary: '#ffffff',
-    danger: '#C7402B',
-    success: '#2F6F4F',
-    border: '#E0E1E6',
-    placeholder: '#9AA0AA',
-    card: '#ffffff',
+    text: '#14121A',
+    background: '#FFFFFF',
+    backgroundElement: '#F5F4F2',
+    backgroundSelected: '#14121A',
+    textSecondary: '#5B5B63',
+    primary: '#14121A',
+    onPrimary: '#FFFFFF',
+    accent: '#FF5A3C',
+    accentSecondary: '#C4F135',
+    danger: '#D6303D',
+    success: '#1F9254',
+    border: '#14121A',
+    divider: '#EDEDEF',
+    placeholder: '#9C9CA5',
+    card: '#FFFFFF',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    primary: '#4FAE7C',
-    onPrimary: '#00170D',
-    danger: '#FF6B57',
-    success: '#4FAE7C',
-    border: '#2E3135',
-    placeholder: '#7A7F87',
-    card: '#151517',
+    text: '#F5F5F7',
+    background: '#0E0D12',
+    backgroundElement: '#1D1B22',
+    backgroundSelected: '#F5F5F7',
+    textSecondary: '#9C9CA5',
+    primary: '#F5F5F7',
+    onPrimary: '#0E0D12',
+    accent: '#FF6B4F',
+    accentSecondary: '#C4F135',
+    danger: '#FF6B6B',
+    success: '#3DD68C',
+    border: '#F5F5F7',
+    divider: '#2A2830',
+    placeholder: '#75737C',
+    card: '#17151C',
   },
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+
+/** Space Grotesk for headings/emphasis, Work Sans for body text. */
+export const AppFonts = {
+  heading: 'SpaceGrotesk_700Bold',
+  headingMedium: 'SpaceGrotesk_500Medium',
+  body: 'WorkSans_400Regular',
+  bodyMedium: 'WorkSans_500Medium',
+  bodySemiBold: 'WorkSans_600SemiBold',
+} as const;
 
 export const Fonts = Platform.select({
   ios: {

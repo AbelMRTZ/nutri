@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   ghostBorder: {
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1.5,
   },
 });

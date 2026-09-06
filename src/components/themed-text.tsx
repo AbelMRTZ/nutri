@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Fonts, ThemeColor } from '@/constants/theme';
+import { AppFonts, Fonts, ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
@@ -32,35 +32,37 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
 
 const styles = StyleSheet.create({
   small: {
+    fontFamily: AppFonts.body,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: 500,
   },
   smallBold: {
+    fontFamily: AppFonts.heading,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: 700,
   },
   default: {
+    fontFamily: AppFonts.bodyMedium,
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: 500,
   },
   title: {
-    fontSize: 48,
-    fontWeight: 600,
-    lineHeight: 52,
+    fontFamily: AppFonts.heading,
+    fontSize: 44,
+    lineHeight: 48,
   },
   subtitle: {
-    fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
+    fontFamily: AppFonts.heading,
+    fontSize: 28,
+    lineHeight: 34,
   },
   link: {
+    fontFamily: AppFonts.bodyMedium,
     lineHeight: 30,
     fontSize: 14,
   },
   linkPrimary: {
+    fontFamily: AppFonts.bodyMedium,
     lineHeight: 30,
     fontSize: 14,
     color: '#3c87f7',

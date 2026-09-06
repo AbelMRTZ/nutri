@@ -18,8 +18,8 @@ export function PlaceholderScreen({ icon, title, description }: PlaceholderScree
 
   return (
     <Screen style={styles.container}>
-      <View style={[styles.iconCircle, { backgroundColor: theme.backgroundElement }]}>
-        <Ionicons name={icon} size={32} color={theme.primary} />
+      <View style={[styles.iconCircle, { backgroundColor: theme.primary }]}>
+        <Ionicons name={icon} size={32} color={theme.accentSecondary} />
       </View>
       <ThemedText type="subtitle" style={styles.title}>
         {title}
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 72,
     height: 72,
-    borderRadius: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,

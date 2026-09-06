@@ -3,11 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { useTheme } from '@/hooks/use-theme';
 
-/**
- * Text-only placeholder wordmark. The real logo/branding is decided in the
- * upcoming visual-design pass — this just needs to occupy the top bar's
- * center slot consistently until then.
- */
+/** Wordmark for the "Vibrante" design direction: a small solid square + bold heading type. */
 export function Logo() {
   const theme = useTheme();
 
@@ -26,8 +22,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 9,
+    height: 9,
   },
 });

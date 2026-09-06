@@ -1,14 +1,19 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { LoginForm } from '@/features/auth';
+import { AuthHeaderAccent, LoginForm } from '@/features/auth';
+import { Logo } from '@/features/app-shell';
 
 export default function LoginScreen() {
   return (
     <Screen scroll style={styles.content}>
+      <AuthHeaderAccent />
+      <View style={styles.logoRow}>
+        <Logo />
+      </View>
       <ThemedText type="title" style={styles.title}>
-        Nutri
+        Bienvenido{'\n'}de vuelta
       </ThemedText>
       <ThemedText type="default" themeColor="textSecondary">
         Inicia sesión para continuar tu seguimiento nutricional.
@@ -24,8 +29,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 16,
   },
+  logoRow: {
+    marginBottom: 8,
+  },
   title: {
-    fontSize: 40,
-    lineHeight: 44,
+    fontSize: 36,
+    lineHeight: 40,
   },
 });

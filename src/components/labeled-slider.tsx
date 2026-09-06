@@ -1,6 +1,7 @@
 import Slider from '@react-native-community/slider';
 import { StyleSheet, View } from 'react-native';
 
+import { FieldLabel } from '@/components/field-label';
 import { ThemedText } from '@/components/themed-text';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -30,10 +31,10 @@ export function LabeledSlider({
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <ThemedText type="small" themeColor="textSecondary">
-          {label}
+        <FieldLabel>{label}</FieldLabel>
+        <ThemedText type="smallBold" style={{ color: theme.accent }}>
+          {formatValue(value)}
         </ThemedText>
-        <ThemedText type="smallBold">{formatValue(value)}</ThemedText>
       </View>
       <Slider
         value={value}
@@ -42,8 +43,8 @@ export function LabeledSlider({
         step={step}
         onValueChange={onValueChange}
         minimumTrackTintColor={theme.primary}
-        maximumTrackTintColor={theme.backgroundElement}
-        thumbTintColor={theme.primary}
+        maximumTrackTintColor={theme.divider}
+        thumbTintColor={theme.accent}
       />
       {error ? (
         <ThemedText type="small" themeColor="danger">
@@ -61,5 +62,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

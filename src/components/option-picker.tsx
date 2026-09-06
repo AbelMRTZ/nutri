@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { FieldLabel } from '@/components/field-label';
 import { ThemedText } from '@/components/themed-text';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -21,9 +22,7 @@ export function OptionPicker<T extends string>({ label, options, value, onChange
 
   return (
     <View style={styles.container}>
-      <ThemedText type="small" themeColor="textSecondary">
-        {label}
-      </ThemedText>
+      <FieldLabel>{label}</FieldLabel>
       <View style={styles.row}>
         {options.map((option) => {
           const selected = option.value === value;
@@ -36,11 +35,11 @@ export function OptionPicker<T extends string>({ label, options, value, onChange
               style={[
                 styles.pill,
                 {
-                  backgroundColor: selected ? theme.primary : theme.backgroundElement,
-                  borderColor: error ? theme.danger : 'transparent',
+                  backgroundColor: selected ? theme.accent : 'transparent',
+                  borderColor: error ? theme.danger : selected ? theme.accent : theme.border,
                 },
               ]}>
-              <ThemedText type="smallBold" style={{ color: selected ? theme.onPrimary : theme.text }}>
+              <ThemedText type="smallBold" style={{ color: selected ? '#FFFFFF' : theme.text }}>
                 {option.label}
               </ThemedText>
             </Pressable>
@@ -58,7 +57,7 @@ export function OptionPicker<T extends string>({ label, options, value, onChange
 
 const styles = StyleSheet.create({
   container: {
-    gap: 6,
+    gap: 8,
   },
   row: {
     flexDirection: 'row',
@@ -68,7 +67,7 @@ const styles = StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+    borderWidth: 1.5,
   },
 });

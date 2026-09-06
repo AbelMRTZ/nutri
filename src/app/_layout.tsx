@@ -1,5 +1,8 @@
+import { SpaceGrotesk_500Medium, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { WorkSans_400Regular, WorkSans_500Medium, WorkSans_600SemiBold } from '@expo-google-fonts/work-sans';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
@@ -33,8 +36,15 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, isLoading: isSessionLoading } = useAuth();
   const { data: profile, isLoading: isProfileLoading } = useProfile(session?.user.id);
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_700Bold,
+    SpaceGrotesk_500Medium,
+    WorkSans_400Regular,
+    WorkSans_500Medium,
+    WorkSans_600SemiBold,
+  });
 
-  const isReady = !isSessionLoading && (!session || !isProfileLoading);
+  const isReady = fontsLoaded && !isSessionLoading && (!session || !isProfileLoading);
 
   useEffect(() => {
     if (isReady) {

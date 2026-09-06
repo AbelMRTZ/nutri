@@ -12,7 +12,7 @@ export function TopBar() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background, borderBottomColor: theme.border, paddingTop: insets.top + 8 }]}>
+    <View style={[styles.container, { backgroundColor: theme.background, borderBottomColor: theme.divider, paddingTop: insets.top + 8 }]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Ajustes"
