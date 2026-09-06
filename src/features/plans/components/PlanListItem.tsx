@@ -5,29 +5,29 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ThemedText } from '@/components/themed-text';
-import { useDeleteFood } from '@/features/foods/hooks/useDeleteFood';
-import { foodCategoryLabels, servingTypeLabels } from '@/features/foods/schema';
+import { useDeletePlan } from '@/features/plans/hooks/useDeletePlan';
+import { planTypeLabels } from '@/features/plans/schema';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyDeleteErrorMessage } from '@/lib/supabase/errors';
 import type { Tables } from '@/lib/supabase/database.types';
 
-export type FoodListItemProps = {
-  food: Tables<'foods'>;
+export type PlanListItemProps = {
+  plan: Tables<'plans'>;
   userId: string | undefined;
 };
 
-export function FoodListItem({ food, userId }: FoodListItemProps) {
+export function PlanListItem({ plan, userId }: PlanListItemProps) {
   const theme = useTheme();
   const router = useRouter();
-  const deleteFood = useDeleteFood(userId);
+  const deletePlan = useDeletePlan(userId);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
   function handleDelete() {
-    deleteFood.mutate(food.id, {
+    deletePlan.mutate(plan.id, {
       onSuccess: () => setConfirmVisible(false),
       onError: (err) => {
-        setError(friendlyDeleteErrorMessage(err, 'Este alimento está en uso y no se puede eliminar.'));
+        setError(friendlyDeleteErrorMessage(err, 'Este plan está en uso y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });
@@ -37,19 +37,16 @@ export function FoodListItem({ food, userId }: FoodListItemProps) {
     <View>
       <Pressable
         style={[styles.row, { borderColor: theme.border }]}
-        onPress={() => router.push(`/(app)/(tabs)/despensa/alimentos/${food.id}`)}>
+        onPress={() => router.push(`/(app)/(tabs)/despensa/planes/${plan.id}`)}>
         <View style={styles.info}>
-          <ThemedText type="smallBold">{food.name}</ThemedText>
+          <ThemedText type="smallBold">{plan.name}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            {foodCategoryLabels[food.category]} · {servingTypeLabels[food.serving_type]}
+            {planTypeLabels[plan.is_special ? 'special' : 'standard']}
           </ThemedText>
         </View>
-        <ThemedText type="small" style={{ color: theme.accent }}>
-          {food.energy_kcal} kcal
-        </ThemedText>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Eliminar alimento"
+          accessibilityLabel="Eliminar plan"
           hitSlop={10}
           style={styles.deleteButton}
           onPress={() => setConfirmVisible(true)}>
@@ -65,9 +62,9 @@ export function FoodListItem({ food, userId }: FoodListItemProps) {
 
       <ConfirmDialog
         visible={confirmVisible}
-        title="Eliminar alimento"
-        description={`¿Seguro que quieres eliminar "${food.name}"? Esta acción no se puede deshacer.`}
-        loading={deleteFood.isPending}
+        title="Eliminar plan"
+        description={`¿Seguro que quieres eliminar "${plan.name}"? Esta acción no se puede deshacer.`}
+        loading={deletePlan.isPending}
         onConfirm={handleDelete}
         onCancel={() => setConfirmVisible(false)}
       />

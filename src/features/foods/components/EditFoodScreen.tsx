@@ -44,7 +44,7 @@ export function EditFoodScreen({ id }: EditFoodScreenProps) {
       onSuccess: () => router.back(),
       onError: (error) => {
         setDeleteError(
-          friendlyDeleteErrorMessage(error, 'Este alimento está en uso en una comida y no se puede eliminar.'),
+          friendlyDeleteErrorMessage(error, 'Este alimento está en uso y no se puede eliminar.'),
         );
         setConfirmVisible(false);
       },

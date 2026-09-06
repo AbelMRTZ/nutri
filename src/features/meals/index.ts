@@ -12,5 +12,7 @@ export { useDeleteMeal } from './hooks/useDeleteMeal';
 export { useMealItems } from './hooks/useMealItems';
 export { useCreateMealItem } from './hooks/useCreateMealItem';
 export { useDeleteMealItem } from './hooks/useDeleteMealItem';
+export { listMealItems } from './api/mealItems';
+export type { MealItemWithFood } from './api/mealItems';
 export { mealCategoryOptions, mealCategoryLabels, mealItemFlexibilityOptions, mealItemFlexibilityLabels } from './schema';
 export type { MealFormValues, MealItemFormValues } from './schema';

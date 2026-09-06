@@ -215,6 +215,132 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_item_foods: {
+        Row: {
+          created_at: string
+          food_id: string
+          id: string
+          is_variable: boolean
+          plan_item_id: string
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          food_id: string
+          id?: string
+          is_variable: boolean
+          plan_item_id: string
+          quantity: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          food_id?: string
+          id?: string
+          is_variable?: boolean
+          plan_item_id?: string
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_item_foods_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_item_foods_plan_item_id_fkey"
+            columns: ["plan_item_id"]
+            isOneToOne: false
+            referencedRelation: "plan_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_items: {
+        Row: {
+          created_at: string
+          id: string
+          meal_id: string
+          plan_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meal_id: string
+          plan_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meal_id?: string
+          plan_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_items_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          calories_target: number | null
+          carbs_g_target: number | null
+          created_at: string
+          fat_g_target: number | null
+          id: string
+          is_special: boolean
+          name: string
+          protein_g_target: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calories_target?: number | null
+          carbs_g_target?: number | null
+          created_at?: string
+          fat_g_target?: number | null
+          id?: string
+          is_special?: boolean
+          name: string
+          protein_g_target?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calories_target?: number | null
+          carbs_g_target?: number | null
+          created_at?: string
+          fat_g_target?: number | null
+          id?: string
+          is_special?: boolean
+          name?: string
+          protein_g_target?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
