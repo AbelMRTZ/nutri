@@ -41,7 +41,10 @@ export default function TabsLayout() {
         tabBarLabelStyle: { fontFamily: AppFonts.heading, fontSize: 11 },
       }}>
       <Tabs.Screen name="index" options={{ title: 'Inicio', tabBarIcon: renderIcon('home-outline') }} />
-      <Tabs.Screen name="calendario" options={{ title: 'Calendario', tabBarIcon: renderIcon('calendar-outline') }} />
+      <Tabs.Screen
+        name="calendario"
+        options={{ title: 'Calendario', tabBarIcon: renderIcon('calendar-outline'), headerShown: false }}
+      />
       <Tabs.Screen
         name="despensa"
         options={{ title: 'Despensa', tabBarIcon: renderIcon('nutrition-outline'), headerShown: false }}

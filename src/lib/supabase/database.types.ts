@@ -17,6 +17,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      calendar_days: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          is_free: boolean
+          plan_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          is_free?: boolean
+          plan_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          is_free?: boolean
+          plan_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_days_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       foods: {
         Row: {
           caffeine_mg: number | null
