@@ -253,6 +253,42 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_item_completions: {
+        Row: {
+          calendar_day_id: string
+          created_at: string
+          id: string
+          plan_item_id: string
+        }
+        Insert: {
+          calendar_day_id: string
+          created_at?: string
+          id?: string
+          plan_item_id: string
+        }
+        Update: {
+          calendar_day_id?: string
+          created_at?: string
+          id?: string
+          plan_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_item_completions_calendar_day_id_fkey"
+            columns: ["calendar_day_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_item_completions_plan_item_id_fkey"
+            columns: ["plan_item_id"]
+            isOneToOne: false
+            referencedRelation: "plan_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plan_item_foods: {
         Row: {
           created_at: string

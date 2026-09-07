@@ -1,11 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ThemedText } from '@/components/themed-text';
 import { AssignedPlanSummary } from '@/features/calendar/components/AssignedPlanSummary';
+import { DailyTrackingSection } from '@/features/calendar/components/DailyTrackingSection';
 import { useCalendarDay } from '@/features/calendar/hooks/useCalendarDay';
 import { useMarkDayFree } from '@/features/calendar/hooks/useMarkDayFree';
 import { useRemoveDayAssignment } from '@/features/calendar/hooks/useRemoveDayAssignment';
@@ -38,40 +39,45 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
   }
 
   return (
-    <View style={styles.container}>
-      <ThemedText type="subtitle">{formatDisplayDate(date)}</ThemedText>
+    <View style={styles.flex}>
+      <ScrollView style={styles.flex} contentContainerStyle={styles.container}>
+        <ThemedText type="subtitle">{formatDisplayDate(date)}</ThemedText>
 
-      {isLoading ? (
-        <ActivityIndicator color={theme.primary} />
-      ) : !calendarDay ? (
-        <View style={styles.actions}>
-          <ThemedText type="default" themeColor="textSecondary">
-            Todavía no has planificado este día.
-          </ThemedText>
-          <Button title="Asignar plan" onPress={handleAssignPlan} />
-          <Button
-            title="Marcar como libre"
-            variant="secondary"
-            loading={markDayFree.isPending}
-            onPress={() => markDayFree.mutate(dateKey)}
-          />
-        </View>
-      ) : calendarDay.is_free ? (
-        <View style={styles.actions}>
-          <View style={[styles.freeBadge, { backgroundColor: theme.accentSecondary }]}>
-            <ThemedText type="smallBold">Día libre</ThemedText>
+        {isLoading ? (
+          <ActivityIndicator color={theme.primary} />
+        ) : !calendarDay ? (
+          <View style={styles.actions}>
+            <ThemedText type="default" themeColor="textSecondary">
+              Todavía no has planificado este día.
+            </ThemedText>
+            <Button title="Asignar plan" onPress={handleAssignPlan} />
+            <Button
+              title="Marcar como libre"
+              variant="secondary"
+              loading={markDayFree.isPending}
+              onPress={() => markDayFree.mutate(dateKey)}
+            />
           </View>
-          <Button title="Quitar" variant="ghost" onPress={() => setConfirmVisible(true)} />
-        </View>
-      ) : isPlanLoading || !plan ? (
-        <ActivityIndicator color={theme.primary} />
-      ) : (
-        <AssignedPlanSummary
-          plan={plan}
-          onEdit={() => router.push(`/(app)/(tabs)/despensa/planes/${plan.id}`)}
-          onRemove={() => setConfirmVisible(true)}
-        />
-      )}
+        ) : calendarDay.is_free ? (
+          <View style={styles.actions}>
+            <View style={[styles.freeBadge, { backgroundColor: theme.accentSecondary }]}>
+              <ThemedText type="smallBold">Día libre</ThemedText>
+            </View>
+            <Button title="Quitar" variant="ghost" onPress={() => setConfirmVisible(true)} />
+          </View>
+        ) : isPlanLoading || !plan ? (
+          <ActivityIndicator color={theme.primary} />
+        ) : (
+          <>
+            <AssignedPlanSummary
+              plan={plan}
+              onEdit={() => router.push(`/(app)/(tabs)/despensa/planes/${plan.id}`)}
+              onRemove={() => setConfirmVisible(true)}
+            />
+            <DailyTrackingSection plan={plan} calendarDayId={calendarDay.id} userId={userId} />
+          </>
+        )}
+      </ScrollView>
 
       <ConfirmDialog
         visible={confirmVisible}
@@ -87,10 +93,13 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  flex: {
     flex: 1,
+  },
+  container: {
     paddingHorizontal: 20,
     paddingTop: 8,
+    paddingBottom: 24,
     gap: 16,
   },
   actions: {
