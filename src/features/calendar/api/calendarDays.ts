@@ -36,6 +36,14 @@ export async function upsertCalendarDay(upsert: CalendarDayUpsert) {
   return data;
 }
 
+/** Bulk version of upsertCalendarDay — used to apply a plan to many dates at once (schedule/repeat). */
+export async function upsertCalendarDays(rows: CalendarDayUpsert[]) {
+  if (rows.length === 0) return [];
+  const { data, error } = await supabase.from('calendar_days').upsert(rows, { onConflict: 'user_id,date' }).select();
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteCalendarDay(id: string) {
   const { error } = await supabase.from('calendar_days').delete().eq('id', id);
   if (error) throw error;

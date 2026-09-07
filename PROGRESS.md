@@ -15,8 +15,9 @@
 | Fase 3 — Calendario, bloque 1 (asignar/quitar planes a días, marcar "Libre") | ✅ Completa y commiteada |
 | Fase 3 — Calendario, bloque 2 (seguimiento de consumo + puntuación diaria) | ✅ Completa y commiteada |
 | Fase 3 — Despensa → Planes: sustitución inteligente de alimentos | ✅ Completa y commiteada (ver nota de alcance abajo) |
-| Fase 3 — Calendario, bloques futuros (programación/repetición de planes) | ⏳ Sin empezar |
-| Fase 4 — Entrenamiento | ⏳ Sin empezar |
+| Fase 3 — Calendario, bloque 3 (programación/repetición de planes) | ✅ Completa y commiteada — **Fase 3 cerrada por completo** |
+| Fase 4 — Entrenamiento, bloque 1 (catálogo de Ejercicios + Rutinas) | 🚧 En curso |
+| Fase 4 — Entrenamiento, bloques futuros (integración con Calendario, seguimiento de sesiones) | ⏳ Sin empezar |
 
 > **Nota de alcance:** el plan original agrupaba "sustitución inteligente" bajo Calendario, pero
 > la funcionalidad opera sobre `plan_item_foods` (la instantánea editable de un plan), no sobre
@@ -25,7 +26,8 @@
 
 Commits hasta ahora (los más recientes primero):
 ```
-(pendiente) Phase 3: Despensa → Planes — smart food substitution
+(pendiente) Phase 3 / slice 3: Calendario → plan scheduling/repetition
+3eb77f0 Phase 3: Despensa → Planes — smart food substitution
 2cb5194 Phase 3 / slice 2: Calendario → daily consumption tracking + score
 6a61e41 Phase 3 / slice 1: Calendario (assign/remove plans per day, free days)
 8f575a3 Add project status handoff + Calendario slice 1 prep work
@@ -75,6 +77,19 @@ Arquitectura de referencia — leer el código es más fiable que resumirlo aqu�
 - Disparador: icono "swap-horizontal-outline" añadido a cada fila de alimento en `PlanMealGroup.tsx` (`PlanItemFoodRow`), junto al icono de eliminar comida ya existente.
 - Verificado end-to-end con datos sembrados por SQL (pollo 200kcal/100g como objetivo a 150g, pavo 150kcal/100g y aceite de oliva 884kcal/100g como candidatos): el pavo salió primero (73% similitud) y el aceite segundo (48%), y sustituir por pavo dejó el plan con "Pavo E2E · 200 g" y los totales de proteína/grasa del plan recalculados correctamente.
 
-## Después de este bloque
+## Qué hay construido en programación/repetición de planes (Fase 3, cierra Calendario)
 
-Queda pendiente: programación/repetición de planes (Fase 3, Calendario). Después de Calendario, queda **Entrenamiento** como última fase grande del encargo original.
+- `src/features/calendar/calculations/schedule.ts` (+ test, módulo puro): `generateScheduleDates(startDate, days, weekdays)` — cada fecha en la ventana `[startDate, startDate+days-1]` cuyo `Date#getDay()` esté en el set `weekdays`. No hay tabla de "reglas recurrentes": la programación **materializa filas `calendar_days` inmediatamente** (bulk upsert) en vez de guardar una regla abstracta a interpretar después — más simple y consistente con que `calendar_days` sea la única fuente de verdad del calendario.
+- `src/features/calendar/api/calendarDays.ts`: nueva `upsertCalendarDays(rows[])` (versión en bloque de `upsertCalendarDay`, mismo `onConflict: 'user_id,date'`). Hook `useApplyPlanSchedule`.
+- `PlanScheduleScreen` (en `calendar`, ruta `despensa/planes/programar-calendario.tsx`, parámetro `planId` — mismo patrón cruzado que `calendario/asignar-plan.tsx` usando una pantalla de `plans`, pero al revés): siempre empieza hoy, con un `NumericField` "repetir durante (días)" y 7 chips de día de la semana (L M X J V S D, todos seleccionados por defecto). Antes de aplicar, calcula conflictos contra `useCalendarDaysRange` (días que ya tienen plan o están libres) y si hay alguno, pide confirmación con `ConfirmDialog` antes de sobrescribir; si no hay conflicto, aplica directo.
+- Disparador: botón "Programar en calendario" en `PlanDetailScreen`, justo debajo de `PlanProgressSummary`.
+- Verificado end-to-end con datos sembrados por SQL (un día ya marcado libre dentro de la ventana): el diálogo de conflicto apareció con el recuento correcto (1), y tras confirmar, ese día pasó de "Día libre" a mostrar el plan programado.
+
+## Alcance pendiente para la siguiente sesión: Fase 4, Entrenamiento
+
+Decisión tomada con el usuario (2026-09-07): el primer bloque de Entrenamiento es un **catálogo de Ejercicios + Rutinas**, en espejo del patrón ya usado en Despensa (Alimentos → Comidas → Planes), **sin tocar todavía el Calendario** (eso queda para un bloque futuro de integración). Construir siguiendo exactamente las convenciones ya establecidas:
+- `src/features/exercises/` (o el nombre que se decida): CRUD de ejercicios (nombre, grupo muscular, quizá equipo/tipo) — mismo patrón que `foods` (schema.ts con enum de categoría, api/, hooks/, componentes de lista/crear/editar).
+- `src/features/routines/` (o similar): una rutina agrupa ejercicios con series/repeticiones/peso (posiblemente con una tabla de snapshot tipo `plan_item_foods` si algún día se quiere "instanciar" una rutina en un día concreto) — mismo patrón que `meals`/`plans`.
+- Rutas bajo `entrenamiento/` con su propio `_layout.tsx`, reemplazando el placeholder actual `src/app/(app)/(tabs)/entrenamiento.tsx`, igual que se hizo con `calendario.tsx` → `calendario/`.
+- Diseñar el esquema de Postgres (nueva(s) migraciones) siguiendo las convenciones ya fijadas arriba (RLS, cascade vs RESTRICT según si la fila es "propiedad exclusiva" o "referencia a catálogo reutilizable").
+- Verificar con el mismo ciclo: `tsc`/`jest`/`expo lint` limpios, `get_advisors` en 0 avisos nuevos, y Playwright end-to-end con usuario de prueba creado por SQL (usando ya la receta correcta de columnas `auth.users` para evitar el 500 de login).

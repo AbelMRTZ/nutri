@@ -119,6 +119,14 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
 
       <PlanProgressSummary totals={totals} targets={targets} />
 
+      <Button
+        variant="secondary"
+        title="Programar en calendario"
+        onPress={() =>
+          router.push({ pathname: '/(app)/(tabs)/despensa/planes/programar-calendario', params: { planId: id } })
+        }
+      />
+
       <View style={styles.itemsSection}>
         <View style={styles.itemsHeader}>
           <ThemedText type="smallBold">Comidas</ThemedText>
