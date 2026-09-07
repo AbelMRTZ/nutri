@@ -3,6 +3,7 @@ export { CreatePlanScreen } from './components/CreatePlanScreen';
 export { PlanDetailScreen } from './components/PlanDetailScreen';
 export { PlanesHeaderActions } from './components/PlanesHeaderActions';
 export { MealPickerScreen } from './components/MealPickerScreen';
+export { FoodSubstitutionPickerScreen } from './components/FoodSubstitutionPickerScreen';
 export { PlanProgressSummary } from './components/PlanProgressSummary';
 export type { PlanTargets } from './components/PlanProgressSummary';
 export type { PlanItemWithDetails } from './api/planItems';

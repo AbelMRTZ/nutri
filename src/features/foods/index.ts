@@ -18,4 +18,6 @@ export {
 export type { FoodFormValues, OptionalNutrientField } from './schema';
 export { calculateFoodContribution } from './calculations/contribution';
 export type { FoodContribution } from './calculations/contribution';
+export { suggestSubstitutes } from './calculations/substitution';
+export type { SubstitutionSuggestion } from './calculations/substitution';
 

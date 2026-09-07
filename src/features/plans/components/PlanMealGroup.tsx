@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
@@ -85,6 +86,7 @@ function PlanItemFoodRow({
   planId: string;
 }) {
   const theme = useTheme();
+  const router = useRouter();
   const updateQuantity = useUpdatePlanItemFoodQuantity(planId);
   const [draftQuantity, setDraftQuantity] = useState<number | undefined>(planItemFood.quantity);
 
@@ -135,6 +137,18 @@ function PlanItemFoodRow({
           {planItemFood.quantity} {unit}
         </ThemedText>
       )}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Sustituir alimento"
+        hitSlop={10}
+        onPress={() =>
+          router.push({
+            pathname: '/(app)/(tabs)/despensa/planes/sustituir-alimento',
+            params: { planId, planItemFoodId: planItemFood.id },
+          })
+        }>
+        <Ionicons name="swap-horizontal-outline" size={18} color={theme.textSecondary} />
+      </Pressable>
     </View>
   );
 }

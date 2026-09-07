@@ -14,3 +14,8 @@ export async function updatePlanItemFoodQuantity(id: string, quantity: number) {
   const { error } = await supabase.from('plan_item_foods').update({ quantity }).eq('id', id);
   if (error) throw error;
 }
+
+export async function substitutePlanItemFood(id: string, foodId: string, quantity: number) {
+  const { error } = await supabase.from('plan_item_foods').update({ food_id: foodId, quantity }).eq('id', id);
+  if (error) throw error;
+}

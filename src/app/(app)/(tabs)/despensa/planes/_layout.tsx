@@ -11,6 +11,7 @@ export default function PlanesLayout() {
       <Stack.Screen name="nuevo" options={{ title: 'Nuevo plan' }} />
       <Stack.Screen name="[id]" options={{ title: 'Editar plan' }} />
       <Stack.Screen name="agregar-comida" options={{ title: 'Añadir comida' }} />
+      <Stack.Screen name="sustituir-alimento" options={{ title: 'Sustituir alimento' }} />
     </Stack>
   );
 }
