@@ -1,0 +1,11 @@
+export { ExercisesListScreen } from './components/ExercisesListScreen';
+export { CreateExerciseScreen } from './components/CreateExerciseScreen';
+export { EditExerciseScreen } from './components/EditExerciseScreen';
+export { EjerciciosHeaderActions } from './components/EjerciciosHeaderActions';
+export { useExercises } from './hooks/useExercises';
+export { useExercise } from './hooks/useExercise';
+export { useCreateExercise } from './hooks/useCreateExercise';
+export { useUpdateExercise } from './hooks/useUpdateExercise';
+export { useDeleteExercise } from './hooks/useDeleteExercise';
+export { muscleGroupOptions, muscleGroupLabels, equipmentOptions, equipmentLabels } from './schema';
+export type { ExerciseFormValues } from './schema';

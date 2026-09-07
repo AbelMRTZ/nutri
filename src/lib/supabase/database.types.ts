@@ -55,6 +55,36 @@ export type Database = {
           },
         ]
       }
+      exercises: {
+        Row: {
+          created_at: string
+          equipment: Database["public"]["Enums"]["exercise_equipment"]
+          id: string
+          muscle_group: Database["public"]["Enums"]["exercise_muscle_group"]
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipment: Database["public"]["Enums"]["exercise_equipment"]
+          id?: string
+          muscle_group: Database["public"]["Enums"]["exercise_muscle_group"]
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          equipment?: Database["public"]["Enums"]["exercise_equipment"]
+          id?: string
+          muscle_group?: Database["public"]["Enums"]["exercise_muscle_group"]
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       foods: {
         Row: {
           caffeine_mg: number | null
@@ -481,6 +511,81 @@ export type Database = {
         }
         Relationships: []
       }
+      routine_exercises: {
+        Row: {
+          created_at: string
+          exercise_id: string
+          id: string
+          reps: number
+          routine_id: string
+          sets: number
+          sort_order: number
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          exercise_id: string
+          id?: string
+          reps: number
+          routine_id: string
+          sets: number
+          sort_order?: number
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          reps?: number
+          routine_id?: string
+          sets?: number
+          sort_order?: number
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_exercises_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routine_exercises_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routines: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -489,6 +594,23 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      exercise_equipment:
+        | "bodyweight"
+        | "free_weights"
+        | "machine"
+        | "bands"
+        | "cardio_machine"
+        | "other"
+      exercise_muscle_group:
+        | "chest"
+        | "back"
+        | "shoulders"
+        | "arms"
+        | "legs"
+        | "core"
+        | "cardio"
+        | "full_body"
+        | "other"
       food_category:
         | "fruit"
         | "vegetable"
@@ -636,6 +758,25 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      exercise_equipment: [
+        "bodyweight",
+        "free_weights",
+        "machine",
+        "bands",
+        "cardio_machine",
+        "other",
+      ],
+      exercise_muscle_group: [
+        "chest",
+        "back",
+        "shoulders",
+        "arms",
+        "legs",
+        "core",
+        "cardio",
+        "full_body",
+        "other",
+      ],
       food_category: [
         "fruit",
         "vegetable",

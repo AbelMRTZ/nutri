@@ -51,7 +51,7 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="entrenamiento"
-        options={{ title: 'Entrenamiento', tabBarIcon: renderIcon('barbell-outline') }}
+        options={{ title: 'Entrenamiento', tabBarIcon: renderIcon('barbell-outline'), headerShown: false }}
       />
     </Tabs>
   );
