@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { AssignedPlanSummary } from '@/features/calendar/components/AssignedPlanSummary';
 import { AssignedRoutineSummary } from '@/features/calendar/components/AssignedRoutineSummary';
 import { DailyTrackingSection } from '@/features/calendar/components/DailyTrackingSection';
+import { DailyTrainingSection } from '@/features/calendar/components/DailyTrainingSection';
 import { useCalendarDay } from '@/features/calendar/hooks/useCalendarDay';
 import { useMarkDayFree } from '@/features/calendar/hooks/useMarkDayFree';
 import { useUpdateCalendarDay } from '@/features/calendar/hooks/useUpdateCalendarDay';
@@ -114,11 +115,14 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
           ) : isRoutineLoading || !routine ? (
             <ActivityIndicator color={theme.primary} />
           ) : (
-            <AssignedRoutineSummary
-              routine={routine}
-              onEdit={() => router.push(`/(app)/(tabs)/entrenamiento/rutinas/${routine.id}`)}
-              onRemove={() => setPendingRemoval('routine')}
-            />
+            <>
+              <AssignedRoutineSummary
+                routine={routine}
+                onEdit={() => router.push(`/(app)/(tabs)/entrenamiento/rutinas/${routine.id}`)}
+                onRemove={() => setPendingRemoval('routine')}
+              />
+              <DailyTrainingSection routine={routine} calendarDayId={calendarDay.id} />
+            </>
           )}
         </View>
       </ScrollView>

@@ -521,6 +521,42 @@ export type Database = {
         }
         Relationships: []
       }
+      routine_exercise_completions: {
+        Row: {
+          calendar_day_id: string
+          created_at: string
+          id: string
+          routine_exercise_id: string
+        }
+        Insert: {
+          calendar_day_id: string
+          created_at?: string
+          id?: string
+          routine_exercise_id: string
+        }
+        Update: {
+          calendar_day_id?: string
+          created_at?: string
+          id?: string
+          routine_exercise_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_exercise_completions_calendar_day_id_fkey"
+            columns: ["calendar_day_id"]
+            isOneToOne: false
+            referencedRelation: "calendar_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routine_exercise_completions_routine_exercise_id_fkey"
+            columns: ["routine_exercise_id"]
+            isOneToOne: false
+            referencedRelation: "routine_exercises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       routine_exercises: {
         Row: {
           created_at: string

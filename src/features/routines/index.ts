@@ -14,3 +14,4 @@ export { useDeleteRoutineExercise } from './hooks/useDeleteRoutineExercise';
 export { useReorderRoutineExercises } from './hooks/useReorderRoutineExercises';
 export { useUpdateRoutineExercise } from './hooks/useUpdateRoutineExercise';
 export type { RoutineFormValues } from './schema';
+export type { RoutineExerciseWithExercise } from './api/routineExercises';
