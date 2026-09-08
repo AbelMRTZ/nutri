@@ -1,3 +1,13 @@
+/* React Native Web renders TextInput as a bare <input>/<textarea> without
+   the app's border-radius, so the browser's native focus outline draws a
+   mismatched rectangle on top of our custom-styled field container.
+   TextField.tsx supplies its own focus indicator (border color change)
+   instead. */
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
 :root {
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,

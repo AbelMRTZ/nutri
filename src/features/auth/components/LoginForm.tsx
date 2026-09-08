@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/button';
 import { ThemedText } from '@/components/themed-text';
 import { TextField } from '@/components/text-field';
+import { friendlyAuthErrorMessage } from '@/features/auth/errors';
 import { useSignIn } from '@/features/auth/hooks/useSignIn';
 import { credentialsSchema, type CredentialsFormValues } from '@/features/auth/schema';
 
@@ -60,7 +61,7 @@ export function LoginForm() {
 
       {signIn.isError ? (
         <ThemedText type="small" themeColor="danger">
-          {signIn.error instanceof Error ? signIn.error.message : 'No se pudo iniciar sesión'}
+          {friendlyAuthErrorMessage(signIn.error)}
         </ThemedText>
       ) : null}
 

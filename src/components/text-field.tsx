@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { FieldLabel } from '@/components/field-label';
@@ -11,8 +12,9 @@ export type TextFieldProps = TextInputProps & {
   suffix?: string;
 };
 
-export function TextField({ label, error, suffix, style, ...rest }: TextFieldProps) {
+export function TextField({ label, error, suffix, style, onFocus, onBlur, ...rest }: TextFieldProps) {
   const theme = useTheme();
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -20,11 +22,19 @@ export function TextField({ label, error, suffix, style, ...rest }: TextFieldPro
       <View
         style={[
           styles.inputRow,
-          { borderColor: error ? theme.danger : theme.border },
+          { borderColor: error ? theme.danger : isFocused ? theme.accent : theme.border },
         ]}>
         <TextInput
           placeholderTextColor={theme.placeholder}
           style={[styles.input, { color: theme.text }, style]}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
           {...rest}
         />
         {suffix ? (
