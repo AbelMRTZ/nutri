@@ -28,7 +28,7 @@ export function DayStrip({ selectedDate, onSelectDate, userId }: DayStripProps) 
   const { data: rangeDays } = useCalendarDaysRange(userId, startKey, endKey);
 
   const statusByDate = useMemo(() => {
-    const map = new Map<string, { is_free: boolean; plan_id: string | null }>();
+    const map = new Map<string, { is_free: boolean; plan_id: string | null; routine_id: string | null }>();
     rangeDays?.forEach((day) => map.set(day.date, day));
     return map;
   }, [rangeDays]);
@@ -45,7 +45,8 @@ export function DayStrip({ selectedDate, onSelectDate, userId }: DayStripProps) 
         const key = toDateKey(item);
         const selected = isSameDay(item, selectedDate);
         const status = statusByDate.get(key);
-        const indicatorColor = status?.is_free ? theme.accentSecondary : status?.plan_id ? theme.accent : undefined;
+        const nutritionColor = status?.is_free ? theme.accentSecondary : status?.plan_id ? theme.accent : undefined;
+        const trainingColor = status?.routine_id ? theme.text : undefined;
 
         return (
           <Pressable
@@ -62,7 +63,10 @@ export function DayStrip({ selectedDate, onSelectDate, userId }: DayStripProps) 
             <ThemedText type="smallBold" style={{ color: selected ? '#FFFFFF' : theme.text }}>
               {item.getDate()}
             </ThemedText>
-            <View style={[styles.indicator, { backgroundColor: indicatorColor ?? 'transparent' }]} />
+            <View style={styles.indicatorRow}>
+              <View style={[styles.indicator, { backgroundColor: nutritionColor ?? 'transparent' }]} />
+              <View style={[styles.indicator, { backgroundColor: trainingColor ?? 'transparent' }]} />
+            </View>
           </Pressable>
         );
       }}
@@ -88,6 +92,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1.5,
+  },
+  indicatorRow: {
+    flexDirection: 'row',
+    gap: 3,
   },
   indicator: {
     width: 5,

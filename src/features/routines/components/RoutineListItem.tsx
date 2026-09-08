@@ -26,7 +26,7 @@ export function RoutineListItem({ routine, userId }: RoutineListItemProps) {
     deleteRoutine.mutate(routine.id, {
       onSuccess: () => setConfirmVisible(false),
       onError: (err) => {
-        setError(friendlyDeleteErrorMessage(err, 'Esta rutina está en uso y no se puede eliminar.'));
+        setError(friendlyDeleteErrorMessage(err, 'Esta rutina está asignada a un día del calendario y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });

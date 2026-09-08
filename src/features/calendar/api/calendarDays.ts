@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import type { TablesInsert } from '@/lib/supabase/database.types';
+import type { TablesInsert, TablesUpdate } from '@/lib/supabase/database.types';
 
 export async function getCalendarDay(userId: string, date: string) {
   const { data, error } = await supabase
@@ -44,7 +44,13 @@ export async function upsertCalendarDays(rows: CalendarDayUpsert[]) {
   return data;
 }
 
-export async function deleteCalendarDay(id: string) {
-  const { error } = await supabase.from('calendar_days').delete().eq('id', id);
+/**
+ * Clears one or more fields on a calendar day (e.g. un-assigning a plan or a
+ * routine, un-marking free) — an update, never a row delete, because
+ * plan/free-day state and routine assignment are independent and can share
+ * the same row: removing one must not silently wipe the other.
+ */
+export async function updateCalendarDay(id: string, updates: TablesUpdate<'calendar_days'>) {
+  const { error } = await supabase.from('calendar_days').update(updates).eq('id', id);
   if (error) throw error;
 }

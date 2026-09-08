@@ -4,7 +4,7 @@
 > al arrancar cualquier sesión de Claude Code en este repo (importado desde `CLAUDE.md`).
 > Sirve para que una sesión nueva retome el trabajo sin perder contexto.
 
-Última actualización: **2026-09-07**.
+Última actualización: **2026-09-08**.
 
 ## Visión general de fases
 
@@ -17,7 +17,8 @@
 | Fase 3 — Despensa → Planes: sustitución inteligente de alimentos | ✅ Completa y commiteada (ver nota de alcance abajo) |
 | Fase 3 — Calendario, bloque 3 (programación/repetición de planes) | ✅ Completa y commiteada — **Fase 3 cerrada por completo** |
 | Fase 4 — Entrenamiento, bloque 1 (catálogo de Ejercicios + Rutinas) | ✅ Completa y commiteada |
-| Fase 4 — Entrenamiento, bloques futuros (integración con Calendario, seguimiento de sesiones) | ⏳ Sin empezar |
+| Fase 4 — Entrenamiento, bloque 2 (integración con Calendario: asignar rutina a un día) | ✅ Completa y commiteada |
+| Fase 4 — Entrenamiento, bloque futuro (seguimiento de sesiones realizadas) | ⏳ Sin empezar |
 
 > **Nota de alcance:** el plan original agrupaba "sustitución inteligente" bajo Calendario, pero
 > la funcionalidad opera sobre `plan_item_foods` (la instantánea editable de un plan), no sobre
@@ -26,7 +27,8 @@
 
 Commits hasta ahora (los más recientes primero):
 ```
-(pendiente) Phase 4 / slice 1: Entrenamiento — Ejercicios + Rutinas catalog
+(pendiente) Phase 4 / slice 2: Calendario ↔ Rutinas assignment
+471c21e Phase 4 / slice 1: Entrenamiento — Ejercicios + Rutinas catalog
 39398f5 Phase 3 / slice 3: Calendario → plan scheduling/repetition (closes Phase 3)
 3eb77f0 Phase 3: Despensa → Planes — smart food substitution
 2cb5194 Phase 3 / slice 2: Calendario → daily consumption tracking + score
@@ -39,7 +41,7 @@ ff58fc3 Apply "Vibrante/Enérgico" as the app's permanent design system
 812732b Phase 1: auth, personalization onboarding, and app shell
 ```
 
-## Qué hay ya construido (Fases 1-4, hasta Entrenamiento bloque 1)
+## Qué hay ya construido (Fases 1-4, hasta Entrenamiento bloque 2)
 
 Arquitectura de referencia — leer el código es más fiable que resumirlo aquí, pero como mapa rápido:
 
@@ -49,8 +51,8 @@ Arquitectura de referencia — leer el código es más fiable que resumirlo aqu�
 - `src/hooks/use-themed-stack-options.ts`: opciones de cabecera compartidas para cualquier `Stack`.
 - `src/lib/dates.ts`: helpers de fecha sin librería externa (`toDateKey`/`fromDateKey`, `addDays`, `isSameDay`, `isToday`, `formatChipWeekday`, `formatDisplayDate` vía `Intl.DateTimeFormat('es-ES', ...)`).
 - Patrón de rutas: cada sección de una tab que necesita varias pantallas se convierte en un directorio con su propio `_layout.tsx` (Stack), y la tab padre (`(tabs)/_layout.tsx`) pasa esa entrada a `headerShown:false` — ver `despensa/_layout.tsx` → `despensa/comidas/_layout.tsx` → `despensa/planes/_layout.tsx`, `calendario/_layout.tsx` y ahora `entrenamiento/_layout.tsx` → `entrenamiento/ejercicios/_layout.tsx` / `entrenamiento/rutinas/_layout.tsx` como ejemplos ya construidos.
-- Base de datos: `supabase/migrations/0001` a `0008` — `profiles`, `foods`, `meals`+`meal_items`, `plans`+`plan_items`+`plan_item_foods`, `calendar_days`, `plan_item_completions`, `exercises`+`routines`+`routine_exercises`. La sustitución de alimentos y la programación de planes **no añadieron migración** (reutilizaron RLS/estructura existente). Convenciones generales: enums de Postgres (no text+check) para catálogos fijos; toda tabla propia de usuario tiene `user_id` + 4 políticas RLS (o resuelve propiedad vía `exists` contra su padre si no tiene `user_id` propio); una tabla hija exclusivamente propiedad de su padre usa FK `on delete cascade` (`meal_items.meal_id`, `plan_items.plan_id`, `plan_item_foods.plan_item_id`, `plan_item_completions.calendar_day_id`/`plan_item_id`, `routine_exercises.routine_id`); una FK a una entidad-catálogo *reutilizable* (`food_id`, `meal_id`, `exercise_id` como "ingrediente") usa RESTRICT (sin `on delete`) para que borrarla en uso lance `23503`, capturado por `src/lib/supabase/errors.ts` (`isForeignKeyViolation`/`friendlyDeleteErrorMessage`).
-- `calendar_days` tiene una fila por `(user_id, date)` (constraint unique), mutuamente exclusiva entre `plan_id` asignado e `is_free` (check constraint); la ausencia de fila para una fecha significa "sin planificar". `plan_item_completions` sigue la misma filosofía: la **existencia** de la fila es el flag "comido" (insert-o-delete vía `useToggleMealCompletion`, sin columna booleana ni `update`).
+- Base de datos: `supabase/migrations/0001` a `0009` — `profiles`, `foods`, `meals`+`meal_items`, `plans`+`plan_items`+`plan_item_foods`, `calendar_days`, `plan_item_completions`, `exercises`+`routines`+`routine_exercises`. La sustitución de alimentos y la programación de planes **no añadieron migración** (reutilizaron RLS/estructura existente). Convenciones generales: enums de Postgres (no text+check) para catálogos fijos; toda tabla propia de usuario tiene `user_id` + 4 políticas RLS (o resuelve propiedad vía `exists` contra su padre si no tiene `user_id` propio); una tabla hija exclusivamente propiedad de su padre usa FK `on delete cascade` (`meal_items.meal_id`, `plan_items.plan_id`, `plan_item_foods.plan_item_id`, `plan_item_completions.calendar_day_id`/`plan_item_id`, `routine_exercises.routine_id`); una FK a una entidad-catálogo *reutilizable* (`food_id`, `meal_id`, `exercise_id`, `routine_id` en `calendar_days` como "ingrediente") usa RESTRICT (sin `on delete`) para que borrarla en uso lance `23503`, capturado por `src/lib/supabase/errors.ts` (`isForeignKeyViolation`/`friendlyDeleteErrorMessage`).
+- `calendar_days` tiene una fila por `(user_id, date)` (constraint unique). `plan_id`/`is_free` son mutuamente exclusivos (check constraint) y representan el estado nutricional del día; `routine_id` (añadido en 0009) es un campo **independiente** en la misma fila — un día puede tener plan de comida Y rutina de entrenamiento a la vez, estar libre Y entrenar, etc., las 4 combinaciones son válidas. La ausencia de fila (o una fila con los tres campos vacíos) significa "sin planificar". Por eso las mutaciones de "quitar" en `calendar` (`useUpdateCalendarDay`) hacen **`update` de un campo concreto a `null`/`false`, nunca `delete` de la fila entera** — borrar la fila para quitar el plan borraría también una rutina asignada ese mismo día si la hubiera. `plan_item_completions` sigue una filosofía relacionada pero distinta: ahí la **existencia** de la fila es el flag "comido" (insert-o-delete vía `useToggleMealCompletion`, sin columna booleana ni `update`), porque esa tabla no comparte fila con nada más.
 - Lección aprendida (arrastre): **no usar librerías de arrastre basadas en gestos** (se probó `react-native-draggable-flatlist`; su medición interna usa `findNodeHandle`, no soportado en RNW). Se sustituyó por botones de subir/bajar.
 - Lección aprendida (RNW + `FlatList` horizontal): un `FlatList`/`ScrollView` horizontal **sin `style` con altura explícita** se estira para ocupar todo el alto disponible del contenedor flex en React Native Web (bien en iOS/Android). Fix: `style` con `height` fija + `flexGrow: 0, flexShrink: 0`. Comprobar siempre visualmente en `expo start --web`, no solo con `tsc`.
 - Verificación end-to-end de cada bloque: usuario de prueba creado por SQL directo (`auth.users`+`auth.identities`, confirmado sin email), Playwright contra `expo start --web`, borrado del usuario de prueba (y sus datos) al terminar. **Detalle importante:** insertar en `auth.users` a mano sin rellenar `email_change`, `email_change_token_new`, `email_change_token_current`, `phone_change`, `phone_change_token` y `reauthentication_token` (dejarlos en `NULL`) hace que el login por password devuelva `500` (el driver Go de GoTrue no puede escanear `NULL` en esas columnas `string`) — hay que ponerlas a `''` explícitamente; ya incorporado en la receta de creación de usuario de prueba usada en todos los bloques desde Calendario bloque 1. `tsc --noEmit`, `npx jest`, `npx expo lint` deben quedar limpios antes de dar un bloque por cerrado, y `get_advisors` (Supabase) debe devolver 0 avisos de seguridad nuevos tras cada migración que sí toque el esquema (el único aviso presente, `auth_leaked_password_protection`, es preexistente).
@@ -58,7 +60,7 @@ Arquitectura de referencia — leer el código es más fiable que resumirlo aqu�
 
 ## Qué hay construido en Calendario, bloque 1 (Fase 3)
 
-- `src/features/calendar/`: `api/calendarDays.ts` (`getCalendarDay`, `listCalendarDaysInRange`, `upsertCalendarDay`, `deleteCalendarDay`), `hooks/` (`useCalendarDay`, `useCalendarDaysRange`, `useAssignPlanToDay`, `useMarkDayFree`, `useRemoveDayAssignment`), `components/` (`DayStrip`, `CalendarDayPanel`, `AssignedPlanSummary`, `CalendarScreen`, `PlanAssignmentPickerScreen` + `PlanPickerListItem`).
+- `src/features/calendar/`: `api/calendarDays.ts` (`getCalendarDay`, `listCalendarDaysInRange`, `upsertCalendarDay`), `hooks/` (`useCalendarDay`, `useCalendarDaysRange`, `useAssignPlanToDay`, `useMarkDayFree`), `components/` (`DayStrip`, `CalendarDayPanel`, `AssignedPlanSummary`, `CalendarScreen`, `PlanAssignmentPickerScreen` + `PlanPickerListItem`). *(Nota: el "quitar" original usaba `deleteCalendarDay`/`useRemoveDayAssignment`, borrando la fila entera; sustituido en el bloque 2 de Entrenamiento por `updateCalendarDay`/`useUpdateCalendarDay` — ver más abajo por qué.)*
 - Rutas: `calendario/_layout.tsx`, `calendario/index.tsx`, `calendario/asignar-plan.tsx`.
 - Verificado end-to-end: asignar plan a un día, "Editar" navega a `despensa/planes/[id]`, "Quitar" con `ConfirmDialog`, "Marcar como libre"/"Quitar" sobre día libre, y borrar desde Despensa → Planes un plan asignado a un día muestra el aviso amigable "en uso" en vez de un error crudo.
 
@@ -98,6 +100,16 @@ Decisión tomada con el usuario (2026-09-07): el primer bloque de Entrenamiento 
 - Rutas: se borró el placeholder plano `entrenamiento.tsx` y se creó `entrenamiento/_layout.tsx` (index con `TopBar`, `ejercicios`/`rutinas` con `headerShown:false`) + los dos sub-stacks (`entrenamiento/ejercicios/_layout.tsx`, `entrenamiento/rutinas/_layout.tsx` con su `agregar-ejercicio.tsx`). Cambiado `entrenamiento` a `headerShown:false` en `(tabs)/_layout.tsx`, igual que `despensa`/`calendario`.
 - Verificado end-to-end con Playwright (usuario de prueba por SQL): crear dos ejercicios, crear una rutina, añadir ambos ejercicios, editar series/reps/peso in-place (persiste tras recargar), reordenar con los botones subir/bajar (orden confirmado antes/después), intentar borrar un ejercicio todavía en uso en una rutina (aviso amigable "en uso" correcto, bloqueado), quitarlo de la rutina y borrarlo con éxito, y borrar la rutina entera.
 
+## Qué hay construido en Entrenamiento, bloque 2 (Fase 4) — integración con Calendario
+
+- `supabase/migrations/0009_calendar_routine_assignment.sql`: añade `calendar_days.routine_id` (nullable, RESTRICT — mismo motivo que `plan_id`) y sustituye las policies `calendar_days_insert_own`/`calendar_days_update_own` para verificar también que un `routine_id`, si está presente, pertenezca al usuario (mismo patrón que ya existía para `plan_id`). **Decisión de diseño clave:** `routine_id` vive en la misma fila que `plan_id`/`is_free` en vez de en una tabla nueva, porque es el mismo día — pero es un campo ortogonal, no mutuamente exclusivo con nada: comer "libre" no implica saltarse el entrenamiento, ni un día de dieta implica entrenar. Esto obligó a un cambio de fondo: las mutaciones de "quitar" ya no pueden borrar la fila entera (harían desaparecer una rutina asignada al quitar el plan, o viceversa), así que `useRemoveDayAssignment`+`deleteCalendarDay` (borraban la fila) se sustituyeron por `useUpdateCalendarDay`+`updateCalendarDay` (limpian un campo concreto a `null`/`false`).
+- `useAssignRoutineToDay` reutiliza `upsertCalendarDay` tal cual (pasando solo `{user_id, date, routine_id}`) — el upsert de PostgREST solo toca en el `ON CONFLICT DO UPDATE` las columnas presentes en el payload, así que asignar una rutina nunca pisa un `plan_id`/`is_free` ya existente en esa fila, y viceversa (ya se confirmó este comportamiento también en `useAssignPlanToDay`/`useMarkDayFree`, que tampoco tocan `routine_id`).
+- `CalendarDayPanel` ahora tiene dos secciones independientes — "Plan del día" (lógica sin cambios de fondo, solo re-cableada a `useUpdateCalendarDay`) y "Entrenamiento del día" (mismo patrón: sin planificar / `AssignedRoutineSummary` con Editar+Quitar). Un único `ConfirmDialog` compartido con estado `pendingRemoval: 'plan' | 'free' | 'routine' | null` en vez de tres diálogos.
+- Nuevos componentes en `calendar`: `AssignedRoutineSummary`, `RoutinePickerListItem`, `RoutineAssignmentPickerScreen` (ruta `calendario/asignar-rutina.tsx`) — mismo patrón que sus equivalentes de `plans`.
+- `DayStrip` ahora pinta hasta dos puntos de indicador por día (nutrición: lima=libre/coral=plan; entrenamiento: punto oscuro si hay rutina asignada), en vez de uno solo.
+- Los mensajes de error amigable de `RoutineListItem`/`RoutineDetailScreen` (ya escritos en el bloque 1, pero nunca alcanzables porque no existía ninguna FK hacia `routines`) ahora sí se activan: "Esta rutina está asignada a un día del calendario y no se puede eliminar."
+- Verificado end-to-end con Playwright: asignar plan y rutina al mismo día, quitar solo la rutina (el plan permanece), quitar solo el plan (la rutina permanece), marcar otro día como libre y asignarle una rutina (ambas conviven, confirmado visualmente con los dos puntos de indicador en el día strip), e intentar borrar una rutina todavía asignada a un día libre (bloqueado con el aviso amigable).
+
 ## Próximos pasos (después de este bloque)
 
-Fase 4, Entrenamiento, bloques futuros: integración con Calendario (asignar una rutina a un día, posiblemente con una tabla de snapshot tipo `plan_item_foods` si se quiere que editar la rutina más tarde no afecte asignaciones ya hechas) y seguimiento de sesiones realizadas (qué series/reps/peso se hicieron de verdad, en espejo de `plan_item_completions`). Ese es el trabajo grande que queda del encargo original.
+Fase 4, Entrenamiento, bloque futuro: seguimiento de sesiones realizadas — qué series/reps/peso se hicieron de verdad en un día concreto, en espejo de `plan_item_completions`/`DailyTrackingSection`. Probablemente una tabla `routine_exercise_completions` (o similar) ligada a `calendar_days` + `routine_exercises`, siguiendo el mismo patrón "la existencia de la fila es el flag" ya usado en `plan_item_completions`. Ese es el último trabajo grande que queda del encargo original.

@@ -60,7 +60,7 @@ export function RoutineDetailScreen({ id }: RoutineDetailScreenProps) {
     deleteRoutine.mutate(id, {
       onSuccess: () => router.back(),
       onError: (error) => {
-        setDeleteError(friendlyDeleteErrorMessage(error, 'Esta rutina está en uso y no se puede eliminar.'));
+        setDeleteError(friendlyDeleteErrorMessage(error, 'Esta rutina está asignada a un día del calendario y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });

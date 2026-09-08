@@ -24,6 +24,7 @@ export type Database = {
           id: string
           is_free: boolean
           plan_id: string | null
+          routine_id: string | null
           updated_at: string
           user_id: string
         }
@@ -33,6 +34,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           plan_id?: string | null
+          routine_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           plan_id?: string | null
+          routine_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -51,6 +54,13 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_days_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines"
             referencedColumns: ["id"]
           },
         ]

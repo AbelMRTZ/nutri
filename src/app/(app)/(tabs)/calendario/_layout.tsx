@@ -10,6 +10,7 @@ export default function CalendarioLayout() {
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="index" options={{ header: () => <TopBar /> }} />
       <Stack.Screen name="asignar-plan" options={{ title: 'Asignar plan' }} />
+      <Stack.Screen name="asignar-rutina" options={{ title: 'Asignar rutina' }} />
     </Stack>
   );
 }
