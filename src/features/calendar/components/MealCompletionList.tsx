@@ -9,24 +9,28 @@ import { useTheme } from '@/hooks/use-theme';
 export type MealCompletionListProps = {
   items: PlanItemWithDetails[];
   completedIds: Set<string>;
+  /** id of the item with a toggle mutation in flight — its row is disabled until it settles, to avoid a double-tap queuing a duplicate insert/delete. */
+  pendingId?: string;
   onToggle: (planItemId: string, completed: boolean) => void;
 };
 
 /** Checklist of a day's plan meals — toggling one marks it eaten/not eaten. */
-export function MealCompletionList({ items, completedIds, onToggle }: MealCompletionListProps) {
+export function MealCompletionList({ items, completedIds, pendingId, onToggle }: MealCompletionListProps) {
   const theme = useTheme();
 
   return (
     <View style={styles.container}>
       {items.map((item) => {
         const completed = completedIds.has(item.id);
+        const disabled = item.id === pendingId;
 
         return (
           <Pressable
             key={item.id}
             accessibilityRole="checkbox"
-            accessibilityState={{ checked: completed }}
-            style={[styles.row, { borderColor: theme.border }]}
+            accessibilityState={{ checked: completed, disabled }}
+            disabled={disabled}
+            style={[styles.row, { borderColor: theme.border, opacity: disabled ? 0.6 : 1 }]}
             onPress={() => onToggle(item.id, !completed)}>
             <View
               style={[

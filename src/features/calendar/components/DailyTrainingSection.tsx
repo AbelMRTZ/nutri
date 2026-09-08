@@ -35,6 +35,7 @@ export function DailyTrainingSection({ routine, calendarDayId }: DailyTrainingSe
       <RoutineExerciseCompletionList
         items={routineExercises}
         completedIds={completedIds}
+        pendingId={toggleCompletion.isPending ? toggleCompletion.variables?.routineExerciseId : undefined}
         onToggle={(routineExerciseId, completed) => toggleCompletion.mutate({ routineExerciseId, completed })}
       />
       <ThemedText type="small" themeColor="textSecondary">

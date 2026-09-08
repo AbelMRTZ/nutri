@@ -57,6 +57,7 @@ export function DailyTrackingSection({ plan, calendarDayId, userId }: DailyTrack
       <MealCompletionList
         items={planItems}
         completedIds={completedIds}
+        pendingId={toggleCompletion.isPending ? toggleCompletion.variables?.planItemId : undefined}
         onToggle={(planItemId, completed) => toggleCompletion.mutate({ planItemId, completed })}
       />
       <DailyScoreSummary totals={consumedTotals} targets={targets} />
