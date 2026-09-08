@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
@@ -9,6 +9,13 @@ import { calculateDefaultMacros } from '@/features/profile/calculations/macros';
 import { calculateCaloriesTarget } from '@/features/profile/calculations/tdee';
 import { hasMacroInputs, type ProfileFormValues } from '@/features/profile/schema';
 
+type MacroSuggestion = {
+  calories_target: number;
+  protein_g_target: number;
+  carbs_g_target: number;
+  fat_g_target: number;
+};
+
 export function MacrosReviewStep() {
   const {
     control,
@@ -18,6 +25,12 @@ export function MacrosReviewStep() {
   } = useFormContext<ProfileFormValues>();
 
   const watched = useWatch<ProfileFormValues>({ control });
+  // The last suggestion actually written into the form (by this effect or
+  // by the "recalcular" button) — lets us tell "the user hasn't touched
+  // these fields since we last suggested something" apart from "the user
+  // edited them manually", so a goal/weight change on a previous step can
+  // still recalculate automatically without ever stomping a real edit.
+  const lastAppliedSuggestion = useRef<MacroSuggestion | null>(null);
 
   const suggestion = useMemo(() => {
     if (!hasMacroInputs(watched)) return null;
@@ -25,17 +38,47 @@ export function MacrosReviewStep() {
     return { calories_target, ...calculateDefaultMacros(calories_target, watched.weight_kg) };
   }, [watched]);
 
-  // Pre-fill once the base inputs are known, without stomping on a value the
-  // user has already reviewed/edited on a previous visit to this step.
   useEffect(() => {
     if (!suggestion) return;
-    if (getValues('calories_target') === undefined) {
+
+    const last = lastAppliedSuggestion.current;
+    // `suggestion` is a new object every render `watched` changes identity,
+    // even when its values didn't — bail out before doing anything else
+    // once it matches what's already applied, or every render anywhere in
+    // the form (now that every wizard step stays mounted) would re-run
+    // applySuggestion forever, each call triggering the next render.
+    if (
+      last !== null &&
+      suggestion.calories_target === last.calories_target &&
+      suggestion.protein_g_target === last.protein_g_target &&
+      suggestion.carbs_g_target === last.carbs_g_target &&
+      suggestion.fat_g_target === last.fat_g_target
+    ) {
+      return;
+    }
+
+    const current: { [K in keyof MacroSuggestion]: number | undefined } = {
+      calories_target: getValues('calories_target'),
+      protein_g_target: getValues('protein_g_target'),
+      carbs_g_target: getValues('carbs_g_target'),
+      fat_g_target: getValues('fat_g_target'),
+    };
+    const untouchedSinceLastSuggestion =
+      current.calories_target === undefined ||
+      (last !== null &&
+        current.calories_target === last.calories_target &&
+        current.protein_g_target === last.protein_g_target &&
+        current.carbs_g_target === last.carbs_g_target &&
+        current.fat_g_target === last.fat_g_target);
+
+    if (untouchedSinceLastSuggestion) {
       applySuggestion(suggestion);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestion?.calories_target]);
+  }, [suggestion]);
 
-  function applySuggestion(values: NonNullable<typeof suggestion>) {
+  function applySuggestion(values: MacroSuggestion) {
+    lastAppliedSuggestion.current = values;
     setValue('calories_target', values.calories_target, { shouldValidate: true });
     setValue('protein_g_target', values.protein_g_target, { shouldValidate: true });
     setValue('carbs_g_target', values.carbs_g_target, { shouldValidate: true });

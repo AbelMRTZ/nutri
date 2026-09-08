@@ -73,7 +73,6 @@ export function ProfileForm({ mode, defaultValues, onSubmit, submitLabel, submit
 
   const step = STEPS[stepIndex];
   const isLastStep = stepIndex === STEPS.length - 1;
-  const StepComponent = step.Component;
 
   async function handleNext() {
     const valid = await methods.trigger(step.fields);
@@ -96,7 +95,25 @@ export function ProfileForm({ mode, defaultValues, onSubmit, submitLabel, submit
           <ThemedText type="subtitle">{step.title}</ThemedText>
         </View>
 
-        <StepComponent />
+        {/*
+          Every step stays mounted the whole time — only the active one is
+          visible (`display: none` on the rest) — instead of conditionally
+          rendering just `step.Component`. Unmounting/remounting a step's
+          Controllers on Atrás/Siguiente hit a react-hook-form quirk: after
+          a Controller re-registers post-remount, sending it a genuinely
+          empty value (`onChange(undefined)`) got silently replaced with
+          the value from before the remount instead of actually clearing,
+          so a field like "21" could never be fully erased once you'd left
+          and returned to its step. Keeping every step's Controllers
+          mounted the entire time (matching how `mode: 'edit'` already
+          renders all three at once with no such bug) sidesteps that
+          re-registration path entirely.
+        */}
+        {STEPS.map((s, index) => (
+          <View key={s.key} style={index === stepIndex ? undefined : styles.hiddenStep}>
+            <s.Component />
+          </View>
+        ))}
 
         <View style={styles.buttonsRow}>
           {stepIndex > 0 ? (
@@ -122,6 +139,9 @@ export function ProfileForm({ mode, defaultValues, onSubmit, submitLabel, submit
 const styles = StyleSheet.create({
   container: {
     gap: 24,
+  },
+  hiddenStep: {
+    display: 'none',
   },
   stepHeader: {
     gap: 4,
