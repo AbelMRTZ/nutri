@@ -1,7 +1,9 @@
 export { FoodsListScreen } from './components/FoodsListScreen';
 export { CreateFoodScreen } from './components/CreateFoodScreen';
 export { EditFoodScreen } from './components/EditFoodScreen';
+export { FoodDetailScreen } from './components/FoodDetailScreen';
 export { AlimentosHeaderActions } from './components/AlimentosHeaderActions';
+export { NutrientChipsRow } from './components/NutrientChipsRow';
 export { useFoods } from './hooks/useFoods';
 export { useFood } from './hooks/useFood';
 export { useCreateFood } from './hooks/useCreateFood';

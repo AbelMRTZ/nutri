@@ -10,9 +10,8 @@ import { NumericField } from '@/components/numeric-field';
 import { OptionPicker } from '@/components/option-picker';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { calculateFoodContribution, useFood } from '@/features/foods';
+import { calculateFoodContribution, NutrientChipsRow, useFood } from '@/features/foods';
 import { useCreateMealItem } from '@/features/meals/hooks/useCreateMealItem';
-import { NutrientChipsRow } from '@/features/meals/components/NutrientChipsRow';
 import {
   mealItemFlexibilityLabels,
   mealItemFlexibilityOptions,

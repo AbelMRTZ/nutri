@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { nutrientLabels, optionalNutrientFields, type FoodContribution } from '@/features/foods';
+import type { FoodContribution } from '@/features/foods/calculations/contribution';
+import { nutrientLabels, optionalNutrientFields } from '@/features/foods/schema';
 import { useTheme } from '@/hooks/use-theme';
 
 export type NutrientChipsRowProps = {

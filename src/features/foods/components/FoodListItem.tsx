@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ErrorBanner } from '@/components/error-banner';
 import { ThemedText } from '@/components/themed-text';
 import { useDeleteFood } from '@/features/foods/hooks/useDeleteFood';
 import { foodCategoryLabels, servingTypeLabels } from '@/features/foods/schema';
@@ -58,9 +59,9 @@ export function FoodListItem({ food, userId }: FoodListItemProps) {
       </Pressable>
 
       {error ? (
-        <ThemedText type="small" themeColor="danger" style={styles.error}>
-          {error}
-        </ThemedText>
+        <View style={styles.error}>
+          <ErrorBanner message={error} onDismiss={() => setError(undefined)} />
+        </View>
       ) : null}
 
       <ConfirmDialog
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   error: {
-    marginTop: -8,
+    marginTop: 4,
     marginBottom: 8,
   },
 });

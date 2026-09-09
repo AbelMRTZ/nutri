@@ -1,8 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
 
-import { EditFoodScreen } from '@/features/foods';
+import { FoodDetailScreen } from '@/features/foods';
 
-export default function EditarAlimento() {
+export default function DetalleAlimento() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  return <EditFoodScreen id={id} />;
+  return <FoodDetailScreen id={id} />;
 }

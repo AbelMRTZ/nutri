@@ -3,9 +3,9 @@ import { useState } from 'react';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { Screen } from '@/components/screen';
-import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/features/auth';
 import { FoodForm } from '@/features/foods/components/FoodForm';
 import { useDeleteFood } from '@/features/foods/hooks/useDeleteFood';
@@ -60,11 +60,7 @@ export function EditFoodScreen({ id }: EditFoodScreenProps) {
         submitLabel="Guardar cambios"
         footer={
           <>
-            {deleteError ? (
-              <ThemedText type="small" themeColor="danger">
-                {deleteError}
-              </ThemedText>
-            ) : null}
+            {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
             <Button variant="ghost" title="Eliminar alimento" onPress={() => setConfirmVisible(true)} />
           </>
         }
