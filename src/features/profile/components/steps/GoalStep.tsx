@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Controller, useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { LabeledSlider } from '@/components/labeled-slider';
@@ -24,12 +24,10 @@ type UiGoal = (typeof uiGoalOptions)[number]['value'];
 const DEFAULT_PACE = 0.4;
 
 export function GoalStep() {
-  const {
-    control,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext<ProfileFormValues>();
+  const { control, setValue, getValues } = useFormContext<ProfileFormValues>();
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useFormContext()`.
+  const { errors } = useFormState({ control });
   const goal = useWatch<ProfileFormValues, 'goal'>({ control, name: 'goal' });
   const weightKg = useWatch<ProfileFormValues, 'weight_kg'>({ control, name: 'weight_kg' });
   const targetWeightKg = useWatch<ProfileFormValues, 'target_weight_kg'>({ control, name: 'target_weight_kg' });
@@ -73,7 +71,13 @@ export function GoalStep() {
 
   return (
     <View style={styles.container}>
-      <OptionPicker label="Objetivo" options={uiGoalOptions} value={uiGoal} onChange={handleUiGoalChange} />
+      <OptionPicker
+        label="Objetivo"
+        options={uiGoalOptions}
+        value={uiGoal}
+        onChange={handleUiGoalChange}
+        error={uiGoal === undefined ? errors.goal?.message : undefined}
+      />
 
       {uiGoal === 'change' ? (
         <>

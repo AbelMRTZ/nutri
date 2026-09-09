@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useFormState, useWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -52,14 +52,13 @@ function QuantityForm({ food, mealId }: { food: Tables<'foods'>; mealId: string 
   const unit = food.serving_type === 'per_unit' ? 'unidades' : 'g';
   const defaultQuantity = food.serving_type === 'per_unit' ? 1 : 100;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<MealItemFormValues>({
+  const { control, handleSubmit } = useForm<MealItemFormValues>({
     resolver: zodResolver(mealItemFormSchema(food.serving_type)),
     defaultValues: { quantity: defaultQuantity, flexibility: 'invariable' },
   });
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useForm()`.
+  const { errors } = useFormState({ control });
 
   const quantity = useWatch({ control, name: 'quantity' });
   const contribution = calculateFoodContribution(food, quantity ?? 0);

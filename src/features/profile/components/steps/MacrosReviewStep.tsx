@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Controller, useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -17,12 +17,10 @@ type MacroSuggestion = {
 };
 
 export function MacrosReviewStep() {
-  const {
-    control,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext<ProfileFormValues>();
+  const { control, setValue, getValues } = useFormContext<ProfileFormValues>();
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useFormContext()`.
+  const { errors } = useFormState({ control });
 
   const watched = useWatch<ProfileFormValues>({ control });
   // The last suggestion actually written into the form (by this effect or

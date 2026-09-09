@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useFormState } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -15,14 +15,13 @@ export type RoutineFormProps = {
 };
 
 export function RoutineForm({ defaultValues, onSubmit, submitLabel = 'Guardar rutina', submitting, footer }: RoutineFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RoutineFormValues>({
+  const { control, handleSubmit } = useForm<RoutineFormValues>({
     resolver: zodResolver(routineFormSchema),
     defaultValues: { name: '', ...defaultValues },
   });
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useForm()`.
+  const { errors } = useFormState({ control });
 
   return (
     <View style={styles.container}>

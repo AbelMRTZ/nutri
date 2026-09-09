@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useFormState, useWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -19,14 +19,14 @@ export type PlanFormProps = {
 };
 
 export function PlanForm({ defaultValues, onSubmit, submitLabel = 'Guardar plan', submitting, footer }: PlanFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PlanFormValues>({
+  const { control, handleSubmit } = useForm<PlanFormValues>({
     resolver: zodResolver(planFormSchema),
     defaultValues: { name: '', type: 'standard', ...defaultValues },
   });
+  // `useFormState` (not `formState` off `useForm()`) — see BasicInfoStep.tsx
+  // for why: the React Compiler doesn't track react-hook-form's Proxy-based
+  // read tracking, so errors silently stopped updating the UI without it.
+  const { errors } = useFormState({ control });
 
   const type = useWatch({ control, name: 'type' });
 

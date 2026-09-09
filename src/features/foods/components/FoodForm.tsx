@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type Control, type FieldErrors, type Path } from 'react-hook-form';
+import { Controller, useForm, useFormState, type Control, type FieldErrors, type Path } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -28,17 +28,16 @@ export type FoodFormProps = {
 };
 
 export function FoodForm({ defaultValues, onSubmit, submitLabel = 'Guardar alimento', submitting, footer }: FoodFormProps) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FoodFormValues>({
+  const { control, handleSubmit } = useForm<FoodFormValues>({
     resolver: zodResolver(foodFormSchema),
     // `name` backs a plain (non-numeric) TextField, so it needs a defined
     // string default from the start — otherwise the input flips from
     // uncontrolled to controlled the moment the user types.
     defaultValues: { name: '', ...defaultValues },
   });
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useForm()`.
+  const { errors } = useFormState({ control });
 
   return (
     <View style={styles.container}>

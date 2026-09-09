@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
-import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
+import { ThemedText } from '@/components/themed-text';
 import { useAuth, useSignOut } from '@/features/auth';
 import { ProfileForm, useUpdateProfile, type ProfileSubmitValues } from '@/features/profile';
 
@@ -15,27 +15,41 @@ export function OnboardingWizard() {
   }
 
   return (
-    <Screen scroll style={styles.content}>
-      <ProfileForm
-        mode="onboarding"
-        defaultValues={{}}
-        onSubmit={handleSubmit}
-        submitting={updateProfile.isPending}
-        submitLabel="Completar registro"
-      />
+    <Screen padded={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <ProfileForm
+          mode="onboarding"
+          defaultValues={{}}
+          onSubmit={handleSubmit}
+          submitting={updateProfile.isPending}
+          submitLabel="Completar registro"
+        />
+      </ScrollView>
 
-      <Button
-        variant="ghost"
-        title="Cancelar y volver a iniciar sesión"
+      <Pressable
+        accessibilityRole="button"
         onPress={() => signOut.mutate()}
-        loading={signOut.isPending}
-      />
+        disabled={signOut.isPending}
+        style={({ pressed }) => [styles.cancelButton, { opacity: pressed || signOut.isPending ? 0.6 : 1 }]}>
+        <ThemedText type="link" themeColor="textSecondary">
+          {signOut.isPending ? 'Cerrando sesión…' : 'Cancelar y volver a iniciar sesión'}
+        </ThemedText>
+      </Pressable>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
-    gap: 24,
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    gap: 16,
+  },
+  cancelButton: {
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
 });

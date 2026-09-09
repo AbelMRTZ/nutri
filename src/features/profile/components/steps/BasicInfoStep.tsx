@@ -1,4 +1,4 @@
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useFormState } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { NumericField } from '@/components/numeric-field';
@@ -8,10 +8,16 @@ import { sexLabels, sexOptions, type ProfileFormValues } from '@/features/profil
 const sexOptionList = sexOptions.map((value) => ({ value, label: sexLabels[value] }));
 
 export function BasicInfoStep() {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<ProfileFormValues>();
+  const { control } = useFormContext<ProfileFormValues>();
+  // `useFormState` (not `formState` destructured off `useFormContext()`) is
+  // required here: react-hook-form normally tracks which `errors` fields a
+  // component reads via a Proxy and re-renders it directly when they change,
+  // but the React Compiler's static memoization doesn't see that hidden
+  // Proxy read as a dependency, so the step silently never re-rendered when
+  // a sibling called `trigger()` on Siguiente — `useFormState` returns a
+  // plain new object on every relevant change instead, which the compiler
+  // does track correctly.
+  const { errors } = useFormState({ control });
 
   return (
     <View style={styles.container}>

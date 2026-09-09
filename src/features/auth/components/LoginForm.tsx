@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useFormState } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -12,14 +12,13 @@ import { credentialsSchema, type CredentialsFormValues } from '@/features/auth/s
 
 export function LoginForm() {
   const signIn = useSignIn();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CredentialsFormValues>({
+  const { control, handleSubmit } = useForm<CredentialsFormValues>({
     resolver: zodResolver(credentialsSchema),
     defaultValues: { email: '', password: '' },
   });
+  // See BasicInfoStep.tsx for why this must be `useFormState`, not
+  // `formState` destructured off `useForm()`.
+  const { errors } = useFormState({ control });
 
   const onSubmit = (values: CredentialsFormValues) => {
     signIn.mutate(values);
