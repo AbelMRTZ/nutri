@@ -293,6 +293,39 @@ export type Database = {
         }
         Relationships: []
       }
+      nutrients: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_es: string | null
+          rank: number | null
+          unit: string
+          usda_nutrient_id: number | null
+          usda_nutrient_nbr: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_es?: string | null
+          rank?: number | null
+          unit: string
+          usda_nutrient_id?: number | null
+          usda_nutrient_nbr: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_es?: string | null
+          rank?: number | null
+          unit?: string
+          usda_nutrient_id?: number | null
+          usda_nutrient_nbr?: string
+        }
+        Relationships: []
+      }
       plan_item_completions: {
         Row: {
           calendar_day_id: string
@@ -521,6 +554,123 @@ export type Database = {
         }
         Relationships: []
       }
+      reference_food_nutrients: {
+        Row: {
+          amount: number
+          created_at: string
+          derivation_code: string | null
+          flag_reason: string | null
+          id: string
+          is_flagged: boolean
+          nutrient_id: string
+          reference_basis: string
+          reference_food_id: string
+          source: Database["public"]["Enums"]["food_source"]
+          source_food_id: string
+          unit: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          derivation_code?: string | null
+          flag_reason?: string | null
+          id?: string
+          is_flagged?: boolean
+          nutrient_id: string
+          reference_basis?: string
+          reference_food_id: string
+          source: Database["public"]["Enums"]["food_source"]
+          source_food_id: string
+          unit: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          derivation_code?: string | null
+          flag_reason?: string | null
+          id?: string
+          is_flagged?: boolean
+          nutrient_id?: string
+          reference_basis?: string
+          reference_food_id?: string
+          source?: Database["public"]["Enums"]["food_source"]
+          source_food_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reference_food_nutrients_nutrient_id_fkey"
+            columns: ["nutrient_id"]
+            isOneToOne: false
+            referencedRelation: "nutrients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reference_food_nutrients_reference_food_id_fkey"
+            columns: ["reference_food_id"]
+            isOneToOne: false
+            referencedRelation: "reference_foods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reference_foods: {
+        Row: {
+          category: Database["public"]["Enums"]["food_category"]
+          created_at: string
+          ean_barcode: string | null
+          flag_reason: string | null
+          id: string
+          imported_at: string
+          is_flagged: boolean
+          name_es: string | null
+          name_original: string
+          serving_type: Database["public"]["Enums"]["food_serving_type"]
+          source: Database["public"]["Enums"]["food_source"]
+          source_dataset: string | null
+          source_dataset_version: string | null
+          source_id: string
+          updated_at: string
+          usda_food_category_raw: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["food_category"]
+          created_at?: string
+          ean_barcode?: string | null
+          flag_reason?: string | null
+          id?: string
+          imported_at?: string
+          is_flagged?: boolean
+          name_es?: string | null
+          name_original: string
+          serving_type?: Database["public"]["Enums"]["food_serving_type"]
+          source: Database["public"]["Enums"]["food_source"]
+          source_dataset?: string | null
+          source_dataset_version?: string | null
+          source_id: string
+          updated_at?: string
+          usda_food_category_raw?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["food_category"]
+          created_at?: string
+          ean_barcode?: string | null
+          flag_reason?: string | null
+          id?: string
+          imported_at?: string
+          is_flagged?: boolean
+          name_es?: string | null
+          name_original?: string
+          serving_type?: Database["public"]["Enums"]["food_serving_type"]
+          source?: Database["public"]["Enums"]["food_source"]
+          source_dataset?: string | null
+          source_dataset_version?: string | null
+          source_id?: string
+          updated_at?: string
+          usda_food_category_raw?: string | null
+        }
+        Relationships: []
+      }
       routine_exercise_completions: {
         Row: {
           calendar_day_id: string
@@ -668,7 +818,12 @@ export type Database = {
         | "beverages"
         | "supplements"
         | "other"
+        | "dairy"
+        | "legumes"
+        | "tubers"
+        | "oils_fats"
       food_serving_type: "per_100g" | "per_unit"
+      food_source: "usda_foundation_foods" | "usda_sr_legacy" | "mercadona"
       goal_type: "lose" | "maintain" | "gain"
       meal_category:
         | "main"
@@ -834,8 +989,13 @@ export const Constants = {
         "beverages",
         "supplements",
         "other",
+        "dairy",
+        "legumes",
+        "tubers",
+        "oils_fats",
       ],
       food_serving_type: ["per_100g", "per_unit"],
+      food_source: ["usda_foundation_foods", "usda_sr_legacy", "mercadona"],
       goal_type: ["lose", "maintain", "gain"],
       meal_category: [
         "main",

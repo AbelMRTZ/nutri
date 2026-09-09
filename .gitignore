@@ -36,3 +36,6 @@ yarn-error.*
 
 # testing
 coverage/
+
+# USDA source data downloaded by scripts/import-usda (large, regenerable, not source)
+data/usda/
