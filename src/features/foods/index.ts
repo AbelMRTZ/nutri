@@ -4,6 +4,7 @@ export { EditFoodScreen } from './components/EditFoodScreen';
 export { FoodDetailScreen } from './components/FoodDetailScreen';
 export { AlimentosHeaderActions } from './components/AlimentosHeaderActions';
 export { NutrientChipsRow } from './components/NutrientChipsRow';
+export { CategoryFilterSection } from './components/CategoryFilterSection';
 export { useFoods } from './hooks/useFoods';
 export { useFood } from './hooks/useFood';
 export { useCreateFood } from './hooks/useCreateFood';
@@ -17,7 +18,7 @@ export {
   optionalNutrientFields,
   nutrientLabels,
 } from './schema';
-export type { FoodFormValues, OptionalNutrientField } from './schema';
+export type { FoodFormValues, OptionalNutrientField, FoodCategory } from './schema';
 export { calculateFoodContribution } from './calculations/contribution';
 export type { FoodContribution } from './calculations/contribution';
 export { suggestSubstitutes } from './calculations/substitution';

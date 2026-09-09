@@ -19,7 +19,9 @@ export const foodCategoryOptions = [
   'other',
 ] as const;
 
-export const foodCategoryLabels: Record<(typeof foodCategoryOptions)[number], string> = {
+export type FoodCategory = (typeof foodCategoryOptions)[number];
+
+export const foodCategoryLabels: Record<FoodCategory, string> = {
   fruit: 'Fruta',
   vegetable: 'Verdura',
   fish: 'Pescado',

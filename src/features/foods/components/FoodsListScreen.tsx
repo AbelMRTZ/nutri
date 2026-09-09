@@ -5,21 +5,15 @@ import { FlatList, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
-import { OptionPicker } from '@/components/option-picker';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/features/auth';
+import { CategoryFilterSection } from '@/features/foods/components/CategoryFilterSection';
 import { FoodListItem } from '@/features/foods/components/FoodListItem';
 import { useFoods } from '@/features/foods/hooks/useFoods';
-import { foodCategoryLabels, foodCategoryOptions } from '@/features/foods/schema';
+import type { FoodCategory } from '@/features/foods/schema';
 import { useTheme } from '@/hooks/use-theme';
-
-const ALL_CATEGORIES = 'all' as const;
-const categoryFilterOptions = [
-  { value: ALL_CATEGORIES, label: 'Todas' },
-  ...foodCategoryOptions.map((value) => ({ value, label: foodCategoryLabels[value] })),
-];
 
 export function FoodsListScreen() {
   const theme = useTheme();
@@ -28,16 +22,22 @@ export function FoodsListScreen() {
   const userId = session?.user.id;
   const { data: foods, isLoading } = useFoods(userId);
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<(typeof categoryFilterOptions)[number]['value']>(ALL_CATEGORIES);
+  const [categories, setCategories] = useState<FoodCategory[]>([]);
+
+  function toggleCategory(category: FoodCategory) {
+    setCategories((current) =>
+      current.includes(category) ? current.filter((value) => value !== category) : [...current, category],
+    );
+  }
 
   const filteredFoods = useMemo(() => {
     if (!foods) return [];
     return foods.filter((food) => {
-      const matchesCategory = category === ALL_CATEGORIES || food.category === category;
+      const matchesCategory = categories.length === 0 || categories.includes(food.category);
       const matchesSearch = food.name.toLowerCase().includes(search.trim().toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [foods, category, search]);
+  }, [foods, categories, search]);
 
   if (isLoading) {
     return <FullScreenSpinner />;
@@ -64,7 +64,7 @@ export function FoodsListScreen() {
     <Screen padded={false} style={styles.screen}>
       <View style={styles.filters}>
         <TextField label="Buscar" placeholder="Nombre del alimento" value={search} onChangeText={setSearch} />
-        <OptionPicker label="Categoría" options={categoryFilterOptions} value={category} onChange={setCategory} />
+        <CategoryFilterSection selected={categories} onToggle={toggleCategory} />
       </View>
 
       {filteredFoods.length === 0 ? (
