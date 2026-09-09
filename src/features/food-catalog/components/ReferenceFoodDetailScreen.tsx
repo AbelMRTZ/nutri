@@ -14,7 +14,7 @@ import { useReferenceFoodNutrients } from '@/features/food-catalog/hooks/useRefe
 import { buildFoodValues } from '@/features/food-catalog/nutrientMapping';
 import { useAuth } from '@/features/auth';
 import {
-  NutrientChipsRow,
+  NutrientBars,
   foodCategoryLabels,
   optionalNutrientFields,
   servingTypeLabels,
@@ -109,7 +109,7 @@ export function ReferenceFoodDetailScreen({ id }: ReferenceFoodDetailScreenProps
           </View>
         </View>
 
-        <NutrientChipsRow contribution={contribution} />
+        <NutrientBars contribution={contribution} servingType={food.serving_type} />
 
         {!canMaterialize ? (
           <ThemedText type="small" themeColor="danger">

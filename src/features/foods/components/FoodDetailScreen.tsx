@@ -7,7 +7,7 @@ import { MacroDonutChart } from '@/components/macro-donut-chart';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { calculateFoodContribution } from '@/features/foods/calculations/contribution';
-import { NutrientChipsRow } from '@/features/foods/components/NutrientChipsRow';
+import { NutrientBars } from '@/features/foods/components/NutrientBars';
 import { useFood } from '@/features/foods/hooks/useFood';
 import { foodCategoryLabels, servingTypeLabels } from '@/features/foods/schema';
 
@@ -63,7 +63,7 @@ export function FoodDetailScreen({ id }: FoodDetailScreenProps) {
         </View>
       </View>
 
-      <NutrientChipsRow contribution={contribution} />
+      <NutrientBars contribution={contribution} servingType={food.serving_type} />
 
       <Button
         variant="secondary"

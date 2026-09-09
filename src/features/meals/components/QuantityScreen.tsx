@@ -10,7 +10,7 @@ import { NumericField } from '@/components/numeric-field';
 import { OptionPicker } from '@/components/option-picker';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { calculateFoodContribution, NutrientChipsRow, useFood } from '@/features/foods';
+import { calculateFoodContribution, NutrientBars, useFood } from '@/features/foods';
 import { useCreateMealItem } from '@/features/meals/hooks/useCreateMealItem';
 import {
   mealItemFlexibilityLabels,
@@ -106,7 +106,7 @@ function QuantityForm({ food, mealId }: { food: Tables<'foods'>; mealId: string 
         </View>
       </View>
 
-      <NutrientChipsRow contribution={contribution} />
+      <NutrientBars contribution={contribution} servingType={food.serving_type} />
 
       <Controller
         control={control}

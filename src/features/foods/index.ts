@@ -3,7 +3,7 @@ export { CreateFoodScreen } from './components/CreateFoodScreen';
 export { EditFoodScreen } from './components/EditFoodScreen';
 export { FoodDetailScreen } from './components/FoodDetailScreen';
 export { AlimentosHeaderActions } from './components/AlimentosHeaderActions';
-export { NutrientChipsRow } from './components/NutrientChipsRow';
+export { NutrientBars } from './components/NutrientBars';
 export { CategoryFilterSection } from './components/CategoryFilterSection';
 export { useFoods } from './hooks/useFoods';
 export { useFood } from './hooks/useFood';
