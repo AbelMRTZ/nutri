@@ -6,6 +6,24 @@ Puebla las tablas `nutrients`, `reference_foods` y `reference_food_nutrients`
 Idempotente: ejecutarlo varias veces sobre los mismos ficheros actualiza las
 filas existentes, nunca las duplica.
 
+> **⚠️ El catálogo en producción está curado a mano — no re-ejecutes este
+> script sin más.** La primera pasada importó los 6.447 alimentos genéricos
+> de ambos datasets, pero el usuario pidió reducirlo a **142 alimentos
+> básicos y universales** (frutas, verduras, carnes, pescado, lácteos,
+> huevos, cereales, legumbres, frutos secos, aceites, tubérculos), cada uno
+> con su nombre en español ya asignado en `translations.es.json`. Ese fichero
+> es ahora la lista completa y autoritativa de qué `fdc_id` deben existir —
+> **volver a ejecutar `npm run import:usda` sobre los CSV completos
+> reinsertaría los 6.305 alimentos eliminados** (un `upsert` no sabe que se
+> borraron a propósito). Si en el futuro hace falta refrescar valores
+> nutricionales desde una versión más reciente de USDA, hazlo así:
+> 1. Ejecuta el import normal (repuebla los 6.447, incluidos los 142 ya
+>    traducidos, que se actualizan en vez de duplicarse).
+> 2. Vuelve a aplicar la curación: `delete from reference_foods where
+>    source_id not in (<lista de fdc_id de translations.es.json>)`.
+> No automaticé este paso porque la curación fue una decisión editorial
+> puntual, no parte del pipeline de importación en sí.
+
 ## 1. Descargar los datasets
 
 Desde la web oficial (gratuita, dominio público), descarga por separado —
@@ -53,10 +71,10 @@ Nada de esto modifica ni descarta un valor original — solo lo señala.
 
 ## Traducciones al español
 
-`translations.es.json` empieza vacío (`{}`). Añade a mano
-`"<fdc_id>": "Nombre en español"` para los alimentos que quieras traducir —
-nunca se genera automáticamente ni con IA. Mientras no exista traducción, la
-app mostraría el nombre original de USDA.
+`translations.es.json` mapea `"<fdc_id>": "Nombre en español"`. Hoy contiene
+las 142 traducciones del catálogo curado (ver aviso arriba) — añade más
+entradas a mano si el catálogo vuelve a ampliarse. Mientras un `fdc_id` no
+tenga traducción aquí, la app muestra el nombre original de USDA.
 
 ## Qué NO hace este script
 
