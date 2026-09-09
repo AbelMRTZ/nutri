@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { ErrorBanner } from '@/components/error-banner';
 import { ThemedText } from '@/components/themed-text';
 import { useDeleteFood } from '@/features/foods/hooks/useDeleteFood';
 import { foodCategoryLabels, servingTypeLabels } from '@/features/foods/schema';
@@ -15,20 +14,20 @@ import type { Tables } from '@/lib/supabase/database.types';
 export type FoodListItemProps = {
   food: Tables<'foods'>;
   userId: string | undefined;
+  onDeleteError: (message: string) => void;
 };
 
-export function FoodListItem({ food, userId }: FoodListItemProps) {
+export function FoodListItem({ food, userId, onDeleteError }: FoodListItemProps) {
   const theme = useTheme();
   const router = useRouter();
   const deleteFood = useDeleteFood(userId);
   const [confirmVisible, setConfirmVisible] = useState(false);
-  const [error, setError] = useState<string | undefined>();
 
   function handleDelete() {
     deleteFood.mutate(food.id, {
       onSuccess: () => setConfirmVisible(false),
       onError: (err) => {
-        setError(friendlyDeleteErrorMessage(err, 'Este alimento está en uso y no se puede eliminar.'));
+        onDeleteError(friendlyDeleteErrorMessage(err, 'Este alimento está en uso y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });
@@ -58,12 +57,6 @@ export function FoodListItem({ food, userId }: FoodListItemProps) {
         </Pressable>
       </Pressable>
 
-      {error ? (
-        <View style={styles.error}>
-          <ErrorBanner message={error} onDismiss={() => setError(undefined)} />
-        </View>
-      ) : null}
-
       <ConfirmDialog
         visible={confirmVisible}
         title="Eliminar alimento"
@@ -90,9 +83,5 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
-  },
-  error: {
-    marginTop: 4,
-    marginBottom: 8,
   },
 });

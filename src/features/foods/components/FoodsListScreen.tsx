@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
+import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
@@ -23,6 +24,7 @@ export function FoodsListScreen() {
   const { data: foods, isLoading } = useFoods(userId);
   const [search, setSearch] = useState('');
   const [categories, setCategories] = useState<FoodCategory[]>([]);
+  const [deleteError, setDeleteError] = useState<string | undefined>();
 
   function toggleCategory(category: FoodCategory) {
     setCategories((current) =>
@@ -61,30 +63,37 @@ export function FoodsListScreen() {
   }
 
   return (
-    <Screen padded={false} style={styles.screen}>
-      <View style={styles.filters}>
-        <TextField label="Buscar" placeholder="Nombre del alimento" value={search} onChangeText={setSearch} />
-        <CategoryFilterSection selected={categories} onToggle={toggleCategory} />
-      </View>
+    <View style={styles.root}>
+      <Screen padded={false} style={styles.screen}>
+        <View style={styles.filters}>
+          <TextField label="Buscar" placeholder="Nombre del alimento" value={search} onChangeText={setSearch} />
+          <CategoryFilterSection selected={categories} onToggle={toggleCategory} />
+        </View>
 
-      {filteredFoods.length === 0 ? (
-        <ThemedText type="small" themeColor="textSecondary" style={styles.empty}>
-          No se han encontrado alimentos.
-        </ThemedText>
-      ) : (
-        <FlatList
-          style={styles.flexList}
-          data={filteredFoods}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => <FoodListItem food={item} userId={userId} />}
-        />
-      )}
-    </Screen>
+        {filteredFoods.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary" style={styles.empty}>
+            No se han encontrado alimentos.
+          </ThemedText>
+        ) : (
+          <FlatList
+            style={styles.flexList}
+            data={filteredFoods}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item }) => <FoodListItem food={item} userId={userId} onDeleteError={setDeleteError} />}
+          />
+        )}
+      </Screen>
+
+      {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',

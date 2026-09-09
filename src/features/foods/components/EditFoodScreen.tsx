@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -52,28 +53,33 @@ export function EditFoodScreen({ id }: EditFoodScreenProps) {
   }
 
   return (
-    <Screen scroll>
-      <FoodForm
-        defaultValues={toFormDefaults(food)}
-        onSubmit={handleSubmit}
-        submitting={updateFood.isPending}
-        submitLabel="Guardar cambios"
-        footer={
-          <>
-            {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
-            <Button variant="ghost" title="Eliminar alimento" onPress={() => setConfirmVisible(true)} />
-          </>
-        }
-      />
+    <View style={styles.root}>
+      <Screen scroll>
+        <FoodForm
+          defaultValues={toFormDefaults(food)}
+          onSubmit={handleSubmit}
+          submitting={updateFood.isPending}
+          submitLabel="Guardar cambios"
+          footer={<Button variant="ghost" title="Eliminar alimento" onPress={() => setConfirmVisible(true)} />}
+        />
 
-      <ConfirmDialog
-        visible={confirmVisible}
-        title="Eliminar alimento"
-        description={`¿Seguro que quieres eliminar "${food.name}"? Esta acción no se puede deshacer.`}
-        loading={deleteFood.isPending}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmVisible(false)}
-      />
-    </Screen>
+        <ConfirmDialog
+          visible={confirmVisible}
+          title="Eliminar alimento"
+          description={`¿Seguro que quieres eliminar "${food.name}"? Esta acción no se puede deshacer.`}
+          loading={deleteFood.isPending}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmVisible(false)}
+        />
+      </Screen>
+
+      {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});
