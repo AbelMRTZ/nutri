@@ -32,3 +32,15 @@ export async function deleteFood(id: string) {
   const { error } = await supabase.from('foods').delete().eq('id', id);
   if (error) throw error;
 }
+
+/** Finds a personal food previously copied from a given catalog food, so "Añadir a mis alimentos" never creates a duplicate. */
+export async function getFoodBySourceReferenceFoodId(userId: string, referenceFoodId: string) {
+  const { data, error } = await supabase
+    .from('foods')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('source_reference_food_id', referenceFoodId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}

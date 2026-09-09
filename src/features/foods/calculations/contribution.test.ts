@@ -42,6 +42,7 @@ function makeFood(overrides: Partial<Tables<'foods'>>): Tables<'foods'> {
     potassium_mg: null,
     sodium_mg: null,
     zinc_mg: null,
+    source_reference_food_id: null,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
     ...overrides,

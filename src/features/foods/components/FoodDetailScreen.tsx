@@ -41,6 +41,11 @@ export function FoodDetailScreen({ id }: FoodDetailScreenProps) {
         <ThemedText type="small" themeColor="textSecondary">
           {foodCategoryLabels[food.category]} · {servingTypeLabels[food.serving_type]}
         </ThemedText>
+        {food.source_reference_food_id ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            Importado del catálogo USDA
+          </ThemedText>
+        ) : null}
       </View>
 
       <View style={styles.chartRow}>

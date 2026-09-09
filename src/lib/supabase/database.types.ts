@@ -120,6 +120,7 @@ export type Database = {
           saturated_fat_g: number | null
           serving_type: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg: number | null
+          source_reference_food_id: string | null
           sugar_g: number | null
           updated_at: string
           user_id: string
@@ -162,6 +163,7 @@ export type Database = {
           saturated_fat_g?: number | null
           serving_type: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg?: number | null
+          source_reference_food_id?: string | null
           sugar_g?: number | null
           updated_at?: string
           user_id: string
@@ -204,6 +206,7 @@ export type Database = {
           saturated_fat_g?: number | null
           serving_type?: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg?: number | null
+          source_reference_food_id?: string | null
           sugar_g?: number | null
           updated_at?: string
           user_id?: string
@@ -222,7 +225,15 @@ export type Database = {
           vitamin_k_mcg?: number | null
           zinc_mg?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "foods_source_reference_food_id_fkey"
+            columns: ["source_reference_food_id"]
+            isOneToOne: false
+            referencedRelation: "reference_foods"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meal_items: {
         Row: {
