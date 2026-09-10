@@ -13,6 +13,7 @@ export type NutrientBarsProps = {
 
 const LEVEL_LABEL: Record<NutrientLevel, string> = {
   alta: 'Alta',
+  normal: 'Normal',
   baja: 'Baja',
   sin_clasificar: '',
   nula: 'Nula',
@@ -22,9 +23,9 @@ const LEVEL_LABEL: Record<NutrientLevel, string> = {
 /**
  * One thin, full-width bar per nutrient — replaces the old wrapping grid of
  * bordered chips. Sorted by level (see NUTRIENT_LEVEL_ORDER): the foods
- * with something notable to say (alta/baja) surface above the ones that
- * don't (nula/desconocido), so e.g. lentils show "Hierro: Alta" near the
- * top and "Cafeína: Desconocido" at the bottom, instead of a flat
+ * with something notable to say (alta/normal/baja) surface above the ones
+ * that don't (nula/desconocido), so e.g. lentils show "Hierro: Alta" near
+ * the top and "Cafeína: Desconocido" at the bottom, instead of a flat
  * alphabetical/insertion-order list a user has to scan in full.
  */
 export function NutrientBars({ contribution, servingType }: NutrientBarsProps) {
@@ -32,6 +33,7 @@ export function NutrientBars({ contribution, servingType }: NutrientBarsProps) {
 
   const levelColor: Record<NutrientLevel, string> = {
     alta: theme.accent,
+    normal: theme.warning,
     baja: theme.accentSecondary,
     sin_clasificar: theme.textSecondary,
     nula: theme.textSecondary,
@@ -52,7 +54,7 @@ export function NutrientBars({ contribution, servingType }: NutrientBarsProps) {
         const { label, unit } = nutrientLabels[field];
         const color = levelColor[level];
         const amountText = level === 'desconocido' ? LEVEL_LABEL.desconocido : `${value} ${unit}`;
-        const levelBadge = level === 'alta' || level === 'baja' ? LEVEL_LABEL[level] : null;
+        const levelBadge = level === 'alta' || level === 'normal' || level === 'baja' ? LEVEL_LABEL[level] : null;
 
         return (
           <View key={field} style={[styles.bar, { backgroundColor: `${color}1A`, borderColor: color }]}>
