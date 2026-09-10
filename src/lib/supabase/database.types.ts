@@ -24,6 +24,7 @@ export type Database = {
           id: string
           is_free: boolean
           plan_id: string | null
+          plan_schedule_id: string | null
           routine_id: string | null
           updated_at: string
           user_id: string
@@ -34,6 +35,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           plan_id?: string | null
+          plan_schedule_id?: string | null
           routine_id?: string | null
           updated_at?: string
           user_id: string
@@ -44,6 +46,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           plan_id?: string | null
+          plan_schedule_id?: string | null
           routine_id?: string | null
           updated_at?: string
           user_id?: string
@@ -54,6 +57,13 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_days_plan_schedule_id_fkey"
+            columns: ["plan_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "plan_recurring_schedules"
             referencedColumns: ["id"]
           },
           {
@@ -453,6 +463,44 @@ export type Database = {
           },
           {
             foreignKeyName: "plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_recurring_schedules: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          plan_id: string
+          updated_at: string
+          user_id: string
+          weekdays: number[]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          plan_id: string
+          updated_at?: string
+          user_id: string
+          weekdays: number[]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          plan_id?: string
+          updated_at?: string
+          user_id?: string
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_recurring_schedules_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"

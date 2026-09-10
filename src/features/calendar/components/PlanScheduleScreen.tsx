@@ -4,12 +4,17 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { NumericField } from '@/components/numeric-field';
+import { OptionPicker } from '@/components/option-picker';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { generateScheduleDates } from '@/features/calendar/calculations/schedule';
+import { generateScheduleDates, RECURRING_SCHEDULE_LOOKAHEAD_WEEKS, weeksToDays } from '@/features/calendar/calculations/schedule';
+import { RecurringScheduleSummary } from '@/features/calendar/components/RecurringScheduleSummary';
+import { useActiveRecurringSchedule } from '@/features/calendar/hooks/useActiveRecurringSchedule';
 import { useApplyPlanSchedule } from '@/features/calendar/hooks/useApplyPlanSchedule';
 import { useCalendarDaysRange } from '@/features/calendar/hooks/useCalendarDaysRange';
+import { useStartRecurringSchedule } from '@/features/calendar/hooks/useStartRecurringSchedule';
 import { useAuth } from '@/features/auth';
 import { usePlan } from '@/features/plans';
 import { useTheme } from '@/hooks/use-theme';
@@ -26,32 +31,40 @@ const WEEKDAY_OPTIONS = [
 ];
 const ALL_WEEKDAYS = new Set(WEEKDAY_OPTIONS.map((option) => option.day));
 
+const DURATION_MODE_OPTIONS = [
+  { value: 'weeks', label: 'Número de semanas' },
+  { value: 'indefinite', label: 'Indefinidamente' },
+] as const;
+type DurationMode = (typeof DURATION_MODE_OPTIONS)[number]['value'];
+
 export type PlanScheduleScreenProps = {
   planId: string;
 };
 
-/** Bulk-assigns a plan to every date, in the next N days from today, that falls on a selected weekday. */
+/** Bulk-assigns a plan to every date, from today, that falls on a selected weekday — for a fixed number of weeks, or indefinitely until disabled. */
 export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
   const theme = useTheme();
   const router = useRouter();
   const { session } = useAuth();
   const userId = session?.user.id;
   const { data: plan } = usePlan(planId);
+  const { data: activeSchedule, isLoading: isLoadingSchedule } = useActiveRecurringSchedule(planId);
   const applySchedule = useApplyPlanSchedule(userId);
-  const [days, setDays] = useState<number | undefined>(7);
+  const startRecurringSchedule = useStartRecurringSchedule(userId);
+  const [durationMode, setDurationMode] = useState<DurationMode>('weeks');
+  const [weeks, setWeeks] = useState<number | undefined>(1);
   const [weekdays, setWeekdays] = useState<Set<number>>(ALL_WEEKDAYS);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   // Stable for the component's lifetime so the preview doesn't shift as time passes while the screen is open.
   const [startDate] = useState(() => new Date());
 
-  const scheduledDates = useMemo(
-    () => generateScheduleDates(startDate, days ?? 0, weekdays),
-    [startDate, days, weekdays],
-  );
+  const days = durationMode === 'indefinite' ? RECURRING_SCHEDULE_LOOKAHEAD_WEEKS * 7 : weeksToDays(startDate, weeks ?? 0);
+
+  const scheduledDates = useMemo(() => generateScheduleDates(startDate, days, weekdays), [startDate, days, weekdays]);
 
   const startKey = toDateKey(startDate);
-  const endKey = toDateKey(addDays(startDate, Math.max((days ?? 1) - 1, 0)));
+  const endKey = toDateKey(addDays(startDate, Math.max(days - 1, 0)));
   const { data: existingDays } = useCalendarDaysRange(userId, startKey, endKey);
 
   const conflictCount = useMemo(() => {
@@ -73,6 +86,11 @@ export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
   }
 
   function applyRows() {
+    if (durationMode === 'indefinite') {
+      startRecurringSchedule.mutate({ planId, weekdays: Array.from(weekdays) }, { onSuccess: () => router.back() });
+      return;
+    }
+
     const rows = scheduledDates.map((date) => ({
       user_id: userId as string,
       date: toDateKey(date),
@@ -82,6 +100,21 @@ export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
     applySchedule.mutate(rows, { onSuccess: () => router.back() });
   }
 
+  if (isLoadingSchedule) {
+    return <FullScreenSpinner />;
+  }
+
+  if (activeSchedule) {
+    return (
+      <Screen scroll style={styles.content}>
+        <ThemedText type="subtitle">Programar {plan ? `"${plan.name}"` : 'plan'}</ThemedText>
+        <RecurringScheduleSummary schedule={activeSchedule} userId={userId} />
+      </Screen>
+    );
+  }
+
+  const isPending = applySchedule.isPending || startRecurringSchedule.isPending;
+
   return (
     <Screen scroll style={styles.content}>
       <ThemedText type="subtitle">Programar {plan ? `"${plan.name}"` : 'plan'}</ThemedText>
@@ -89,7 +122,20 @@ export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
         Se asignará este plan a partir de hoy, en los días de la semana que elijas.
       </ThemedText>
 
-      <NumericField label="Repetir durante (días)" value={days} onChangeNumber={setDays} suffix="días" />
+      <OptionPicker label="Duración" options={DURATION_MODE_OPTIONS} value={durationMode} onChange={setDurationMode} />
+
+      {durationMode === 'weeks' ? (
+        <NumericField
+          label="Repetir durante (semanas, contando la actual)"
+          value={weeks}
+          onChangeNumber={setWeeks}
+          suffix="semanas"
+        />
+      ) : (
+        <ThemedText type="small" themeColor="textSecondary">
+          El plan se repetirá en los días marcados hasta que desactives la repetición desde esta misma pantalla.
+        </ThemedText>
+      )}
 
       <View style={styles.weekdaySection}>
         <ThemedText type="smallBold">Días de la semana</ThemedText>
@@ -115,16 +161,22 @@ export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
         </View>
       </View>
 
-      <ThemedText type="small" themeColor="textSecondary">
-        {scheduledDates.length === 0
-          ? 'Selecciona al menos un día de la semana.'
-          : `Se asignará a ${scheduledDates.length} día${scheduledDates.length === 1 ? '' : 's'}.`}
-      </ThemedText>
+      {durationMode === 'weeks' ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {scheduledDates.length === 0
+            ? 'Selecciona al menos un día de la semana.'
+            : `Se asignará a ${scheduledDates.length} día${scheduledDates.length === 1 ? '' : 's'}.`}
+        </ThemedText>
+      ) : weekdays.size === 0 ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          Selecciona al menos un día de la semana.
+        </ThemedText>
+      ) : null}
 
       <Button
-        title="Programar plan"
+        title={durationMode === 'indefinite' ? 'Activar repetición' : 'Programar plan'}
         disabled={scheduledDates.length === 0}
-        loading={applySchedule.isPending}
+        loading={isPending}
         onPress={() => (conflictCount > 0 ? setConfirmVisible(true) : applyRows())}
       />
 
@@ -133,7 +185,7 @@ export function PlanScheduleScreen({ planId }: PlanScheduleScreenProps) {
         title="Sobrescribir días existentes"
         description={`${conflictCount} de los días seleccionados ya tienen un plan asignado o están marcados como libres. ¿Quieres sobrescribirlos?`}
         confirmLabel="Sobrescribir"
-        loading={applySchedule.isPending}
+        loading={isPending}
         onConfirm={() => {
           setConfirmVisible(false);
           applyRows();
