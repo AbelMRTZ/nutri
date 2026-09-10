@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
+import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
@@ -17,6 +19,7 @@ export function PlansListScreen() {
   const { session } = useAuth();
   const userId = session?.user.id;
   const { data: plans, isLoading } = usePlans(userId);
+  const [deleteError, setDeleteError] = useState<string | undefined>();
 
   if (isLoading) {
     return <FullScreenSpinner />;
@@ -40,18 +43,25 @@ export function PlansListScreen() {
   }
 
   return (
-    <Screen padded={false}>
-      <FlatList
-        data={plans}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => <PlanListItem plan={item} userId={userId} />}
-      />
-    </Screen>
+    <View style={styles.root}>
+      <Screen padded={false}>
+        <FlatList
+          data={plans}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => <PlanListItem plan={item} userId={userId} onDeleteError={setDeleteError} />}
+        />
+      </Screen>
+
+      {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',

@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
@@ -90,7 +91,9 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
     deletePlan.mutate(id, {
       onSuccess: () => router.back(),
       onError: (error) => {
-        setDeleteError(friendlyDeleteErrorMessage(error, 'Este plan está en uso y no se puede eliminar.'));
+        setDeleteError(
+          friendlyDeleteErrorMessage(error, 'Este plan está asignado a un día del calendario y no se puede eliminar.'),
+        );
         setConfirmVisible(false);
       },
     });
@@ -109,77 +112,79 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
   }
 
   return (
-    <Screen scroll style={styles.content}>
-      <PlanForm
-        defaultValues={toFormDefaults(plan)}
-        onSubmit={handleSubmit}
-        submitting={updatePlan.isPending}
-        submitLabel="Guardar cambios"
-      />
+    <View style={styles.root}>
+      <Screen scroll style={styles.content}>
+        <PlanForm
+          defaultValues={toFormDefaults(plan)}
+          onSubmit={handleSubmit}
+          submitting={updatePlan.isPending}
+          submitLabel="Guardar cambios"
+        />
 
-      <PlanProgressSummary totals={totals} targets={targets} />
+        <PlanProgressSummary totals={totals} targets={targets} />
 
-      <Button
-        variant="secondary"
-        title="Programar en calendario"
-        onPress={() =>
-          router.push({ pathname: '/(app)/(tabs)/despensa/planes/programar-calendario', params: { planId: id } })
-        }
-      />
+        <Button
+          variant="secondary"
+          title="Programar en calendario"
+          onPress={() =>
+            router.push({ pathname: '/(app)/(tabs)/despensa/planes/programar-calendario', params: { planId: id } })
+          }
+        />
 
-      <View style={styles.itemsSection}>
-        <View style={styles.itemsHeader}>
-          <ThemedText type="smallBold">Comidas</ThemedText>
-          <Button
-            variant="secondary"
-            title="Añadir comida"
-            onPress={() =>
-              router.push({ pathname: '/(app)/(tabs)/despensa/planes/agregar-comida', params: { planId: id } })
-            }
-          />
+        <View style={styles.itemsSection}>
+          <View style={styles.itemsHeader}>
+            <ThemedText type="smallBold">Comidas</ThemedText>
+            <Button
+              variant="secondary"
+              title="Añadir comida"
+              onPress={() =>
+                router.push({ pathname: '/(app)/(tabs)/despensa/planes/agregar-comida', params: { planId: id } })
+              }
+            />
+          </View>
+
+          {orderedItems.length === 0 ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              Todavía no has añadido ninguna comida.
+            </ThemedText>
+          ) : (
+            <View style={styles.itemsList}>
+              {orderedItems.map((item, index) => (
+                <PlanMealGroup
+                  key={item.id}
+                  item={item}
+                  planId={id}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < orderedItems.length - 1}
+                  onMoveUp={() => moveItem(index, -1)}
+                  onMoveDown={() => moveItem(index, 1)}
+                />
+              ))}
+            </View>
+          )}
         </View>
 
-        {orderedItems.length === 0 ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            Todavía no has añadido ninguna comida.
-          </ThemedText>
-        ) : (
-          <View style={styles.itemsList}>
-            {orderedItems.map((item, index) => (
-              <PlanMealGroup
-                key={item.id}
-                item={item}
-                planId={id}
-                canMoveUp={index > 0}
-                canMoveDown={index < orderedItems.length - 1}
-                onMoveUp={() => moveItem(index, -1)}
-                onMoveDown={() => moveItem(index, 1)}
-              />
-            ))}
-          </View>
-        )}
-      </View>
+        <Button variant="ghost" title="Eliminar plan" onPress={() => setConfirmVisible(true)} />
 
-      {deleteError ? (
-        <ThemedText type="small" themeColor="danger">
-          {deleteError}
-        </ThemedText>
-      ) : null}
-      <Button variant="ghost" title="Eliminar plan" onPress={() => setConfirmVisible(true)} />
+        <ConfirmDialog
+          visible={confirmVisible}
+          title="Eliminar plan"
+          description={`¿Seguro que quieres eliminar "${plan.name}"? Esta acción no se puede deshacer.`}
+          loading={deletePlan.isPending}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmVisible(false)}
+        />
+      </Screen>
 
-      <ConfirmDialog
-        visible={confirmVisible}
-        title="Eliminar plan"
-        description={`¿Seguro que quieres eliminar "${plan.name}"? Esta acción no se puede deshacer.`}
-        loading={deletePlan.isPending}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmVisible(false)}
-      />
-    </Screen>
+      {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   content: {
     gap: 24,
   },

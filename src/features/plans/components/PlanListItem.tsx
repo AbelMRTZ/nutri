@@ -14,20 +14,20 @@ import type { Tables } from '@/lib/supabase/database.types';
 export type PlanListItemProps = {
   plan: Tables<'plans'>;
   userId: string | undefined;
+  onDeleteError: (message: string) => void;
 };
 
-export function PlanListItem({ plan, userId }: PlanListItemProps) {
+export function PlanListItem({ plan, userId, onDeleteError }: PlanListItemProps) {
   const theme = useTheme();
   const router = useRouter();
   const deletePlan = useDeletePlan(userId);
   const [confirmVisible, setConfirmVisible] = useState(false);
-  const [error, setError] = useState<string | undefined>();
 
   function handleDelete() {
     deletePlan.mutate(plan.id, {
       onSuccess: () => setConfirmVisible(false),
       onError: (err) => {
-        setError(friendlyDeleteErrorMessage(err, 'Este plan está en uso y no se puede eliminar.'));
+        onDeleteError(friendlyDeleteErrorMessage(err, 'Este plan está asignado a un día del calendario y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });
@@ -53,12 +53,6 @@ export function PlanListItem({ plan, userId }: PlanListItemProps) {
           <Ionicons name="trash-outline" size={18} color={theme.textSecondary} />
         </Pressable>
       </Pressable>
-
-      {error ? (
-        <ThemedText type="small" themeColor="danger" style={styles.error}>
-          {error}
-        </ThemedText>
-      ) : null}
 
       <ConfirmDialog
         visible={confirmVisible}
@@ -86,9 +80,5 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
-  },
-  error: {
-    marginTop: -8,
-    marginBottom: 8,
   },
 });

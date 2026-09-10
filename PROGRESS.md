@@ -249,3 +249,12 @@ Petición de paridad del usuario: Comidas ya mostraba el mensaje correcto al int
 - `MealDetailScreen`: sustituye el `ThemedText` inline por el mismo `View flex:1` + `ErrorBanner` hermano de `Screen` — mismo patrón que `EditFoodScreen`.
 - Verificado con Playwright (plan + comida sembrados por SQL, comida en uso en el plan): el toast aparece justo encima del menú de tabs sin desplazar la fila de la comida, tanto al borrar desde el listado como desde la pantalla de detalle/edición, y desaparece solo a los ~5s sin dejar hueco.
 - `tsc --noEmit`, `npx jest`, `npx expo lint` limpios; sin migraciones nuevas (cambio puramente de UI).
+
+## Mismo toast flotante "en uso" para Planes asignados al calendario (2026-09-10)
+
+Misma petición de paridad, ahora para Planes: `PlanListItem` ya mostraba el aviso correcto al intentar eliminar un plan asignado a un día del calendario, pero como `ThemedText` inline. Se aplicó el mismo cambio que a Comidas, con el mismo patrón `ErrorBanner`.
+
+- `PlanListItem`/`PlansListScreen`/`PlanDetailScreen`: mismos tres cambios que en Comidas (prop `onDeleteError` delegado, estado a nivel de pantalla, `View flex:1` + `ErrorBanner` hermano de `Screen`).
+- Aprovechado para afinar el texto del aviso, de genérico a específico (igual de concreto que el de Comidas): de "Este plan está en uso y no se puede eliminar." a "Este plan está asignado a un día del calendario y no se puede eliminar." (`friendlyDeleteErrorMessage` en sí no cambió, solo el mensaje que le pasa cada pantalla).
+- Verificado con Playwright (plan asignado a un día del calendario sembrado por SQL): mismo toast, mismo formato, en el listado y en el detalle.
+- `tsc --noEmit`, `npx jest`, `npx expo lint` limpios; sin migraciones nuevas.
