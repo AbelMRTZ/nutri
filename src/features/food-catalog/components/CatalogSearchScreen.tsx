@@ -50,7 +50,7 @@ export function CatalogSearchScreen() {
             <ReferenceFoodListItem
               food={item}
               onPress={() =>
-                router.push({ pathname: '/(app)/(tabs)/despensa/investigar/[id]', params: { id: item.id } })
+                router.push({ pathname: '/(app)/(tabs)/despensa/alimentos/usda/[id]', params: { id: item.id } })
               }
             />
           )}
