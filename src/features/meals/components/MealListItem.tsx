@@ -14,20 +14,20 @@ import type { Tables } from '@/lib/supabase/database.types';
 export type MealListItemProps = {
   meal: Tables<'meals'>;
   userId: string | undefined;
+  onDeleteError: (message: string) => void;
 };
 
-export function MealListItem({ meal, userId }: MealListItemProps) {
+export function MealListItem({ meal, userId, onDeleteError }: MealListItemProps) {
   const theme = useTheme();
   const router = useRouter();
   const deleteMeal = useDeleteMeal(userId);
   const [confirmVisible, setConfirmVisible] = useState(false);
-  const [error, setError] = useState<string | undefined>();
 
   function handleDelete() {
     deleteMeal.mutate(meal.id, {
       onSuccess: () => setConfirmVisible(false),
       onError: (err) => {
-        setError(friendlyDeleteErrorMessage(err, 'Esta comida está en uso en un plan y no se puede eliminar.'));
+        onDeleteError(friendlyDeleteErrorMessage(err, 'Esta comida está en uso en un plan y no se puede eliminar.'));
         setConfirmVisible(false);
       },
     });
@@ -53,12 +53,6 @@ export function MealListItem({ meal, userId }: MealListItemProps) {
           <Ionicons name="trash-outline" size={18} color={theme.textSecondary} />
         </Pressable>
       </Pressable>
-
-      {error ? (
-        <ThemedText type="small" themeColor="danger" style={styles.error}>
-          {error}
-        </ThemedText>
-      ) : null}
 
       <ConfirmDialog
         visible={confirmVisible}
@@ -86,9 +80,5 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
-  },
-  error: {
-    marginTop: -8,
-    marginBottom: 8,
   },
 });

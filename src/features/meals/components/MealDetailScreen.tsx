@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
@@ -52,55 +53,57 @@ export function MealDetailScreen({ id }: MealDetailScreenProps) {
   }
 
   return (
-    <Screen scroll style={styles.content}>
-      <MealForm
-        defaultValues={toFormDefaults(meal)}
-        onSubmit={handleSubmit}
-        submitting={updateMeal.isPending}
-        submitLabel="Guardar cambios"
-      />
+    <View style={styles.root}>
+      <Screen scroll style={styles.content}>
+        <MealForm
+          defaultValues={toFormDefaults(meal)}
+          onSubmit={handleSubmit}
+          submitting={updateMeal.isPending}
+          submitLabel="Guardar cambios"
+        />
 
-      <View style={styles.itemsSection}>
-        <View style={styles.itemsHeader}>
-          <ThemedText type="smallBold">Alimentos</ThemedText>
-          <Button
-            variant="secondary"
-            title="Añadir alimento"
-            onPress={() =>
-              router.push({ pathname: '/(app)/(tabs)/despensa/comidas/agregar-alimento', params: { mealId: id } })
-            }
-          />
+        <View style={styles.itemsSection}>
+          <View style={styles.itemsHeader}>
+            <ThemedText type="smallBold">Alimentos</ThemedText>
+            <Button
+              variant="secondary"
+              title="Añadir alimento"
+              onPress={() =>
+                router.push({ pathname: '/(app)/(tabs)/despensa/comidas/agregar-alimento', params: { mealId: id } })
+              }
+            />
+          </View>
+
+          {!items || items.length === 0 ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              Todavía no has añadido ningún alimento.
+            </ThemedText>
+          ) : (
+            items.map((item) => <MealItemRow key={item.id} item={item} mealId={id} />)
+          )}
         </View>
 
-        {!items || items.length === 0 ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            Todavía no has añadido ningún alimento.
-          </ThemedText>
-        ) : (
-          items.map((item) => <MealItemRow key={item.id} item={item} mealId={id} />)
-        )}
-      </View>
+        <Button variant="ghost" title="Eliminar comida" onPress={() => setConfirmVisible(true)} />
 
-      {deleteError ? (
-        <ThemedText type="small" themeColor="danger">
-          {deleteError}
-        </ThemedText>
-      ) : null}
-      <Button variant="ghost" title="Eliminar comida" onPress={() => setConfirmVisible(true)} />
+        <ConfirmDialog
+          visible={confirmVisible}
+          title="Eliminar comida"
+          description={`¿Seguro que quieres eliminar "${meal.name}"? Esta acción no se puede deshacer.`}
+          loading={deleteMeal.isPending}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmVisible(false)}
+        />
+      </Screen>
 
-      <ConfirmDialog
-        visible={confirmVisible}
-        title="Eliminar comida"
-        description={`¿Seguro que quieres eliminar "${meal.name}"? Esta acción no se puede deshacer.`}
-        loading={deleteMeal.isPending}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmVisible(false)}
-      />
-    </Screen>
+      {deleteError ? <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(undefined)} /> : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   content: {
     gap: 24,
   },

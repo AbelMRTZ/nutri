@@ -239,3 +239,13 @@ Corrección de sitio del usuario: "Investigar Alimentos" nunca estaba pensado co
 - **`AlimentosHeaderActions`**: el botón "+" ya no navega directo a "Nuevo alimento" — abre un menú modal (mismo patrón visual que `ConfirmDialog`: `Modal` transparente + tarjeta con borde) con tres filas: "Alimento Propio" (icono `create-outline`, va a `alimentos/nuevo`), "Alimento USDA" (icono `globe-outline`, va a `alimentos/usda`) y "Alimento por QR" (icono `qr-code-outline`, sin ruta todavía — muestra el mismo `Alert.alert('Próximamente', ...)` ya usado por el botón de Ayuda, en vez de no hacer nada).
 - Verificado con Playwright (usuario de prueba por SQL): el menú de Despensa muestra el placeholder correcto al pulsar "Investigar Alimentos"; el "+" de Alimentos abre el menú de 3 opciones; "Alimento USDA" abre "Catálogo USDA", buscar "tomate" devuelve "Tomate crudo" y su detalle carga con las barras de micronutrientes; "Alimento Propio" abre el formulario "Nuevo alimento" de siempre.
 - `tsc --noEmit`, `npx jest`, `npx expo lint` limpios; sin migraciones nuevas (cambio de rutas/navegación, no de esquema).
+
+## Toast flotante "en uso" también para Comidas (2026-09-10)
+
+Petición de paridad del usuario: Comidas ya mostraba el mensaje correcto al intentar eliminar una comida en uso en un plan ("Esta comida está en uso en un plan y no se puede eliminar."), pero renderizado como un `ThemedText` inline (empujando el resto del layout) — el mismo problema que tenía Alimentos antes de convertirse en el toast flotante `ErrorBanner`. Se aplicó exactamente el mismo cambio, sin tocar el texto del mensaje ni la lógica de `friendlyDeleteErrorMessage`, que ya era correcta.
+
+- `MealListItem`: pierde su estado local `error` y el `ThemedText` inline; gana un prop `onDeleteError(message)` delegado al padre — mismo patrón que `FoodListItem`.
+- `MealsListScreen`: añade el estado `deleteError`, envuelve `Screen` en un `View flex:1` hermano de un `ErrorBanner` a nivel de pantalla, y pasa `onDeleteError={setDeleteError}` a cada `MealListItem` — mismo patrón que `FoodsListScreen`.
+- `MealDetailScreen`: sustituye el `ThemedText` inline por el mismo `View flex:1` + `ErrorBanner` hermano de `Screen` — mismo patrón que `EditFoodScreen`.
+- Verificado con Playwright (plan + comida sembrados por SQL, comida en uso en el plan): el toast aparece justo encima del menú de tabs sin desplazar la fila de la comida, tanto al borrar desde el listado como desde la pantalla de detalle/edición, y desaparece solo a los ~5s sin dejar hueco.
+- `tsc --noEmit`, `npx jest`, `npx expo lint` limpios; sin migraciones nuevas (cambio puramente de UI).
