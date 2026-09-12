@@ -6,21 +6,27 @@
 
 -- ── Part 1: tear down the old training feature ─────────────────────────────
 
+-- calendar_days_insert_own/update_own are currently defined by 0014 (which
+-- replaced 0009's version to also check plan_schedule_id) and both reference
+-- routine_id — they (and the column's own FK) must go before `routines` can
+-- be dropped. Redefine them a third time here, this time dropping the
+-- routine_id clause entirely while leaving the plan_id/plan_schedule_id
+-- checks untouched. routine_exercise_completions_insert_own also reads
+-- calendar_days.routine_id (to verify a completion belongs to the routine
+-- actually assigned that day), so that table has to go before the column can
+-- be dropped too.
+drop policy "calendar_days_insert_own" on public.calendar_days;
+drop policy "calendar_days_update_own" on public.calendar_days;
+
 drop table public.routine_exercise_completions;
+
+alter table public.calendar_days drop column routine_id;
+
 drop table public.routine_exercises;
 drop table public.routines;
 drop table public.exercises;
 drop type exercise_muscle_group;
 drop type exercise_equipment;
-
-alter table public.calendar_days drop column routine_id;
-
--- calendar_days_insert_own/update_own are currently defined by 0014 (which
--- replaced 0009's version to also check plan_schedule_id). Redefine them a
--- third time, this time dropping the routine_id clause entirely while
--- leaving the plan_id/plan_schedule_id checks untouched.
-drop policy "calendar_days_insert_own" on public.calendar_days;
-drop policy "calendar_days_update_own" on public.calendar_days;
 
 create policy "calendar_days_insert_own" on public.calendar_days
   for insert with check (
