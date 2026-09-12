@@ -7,6 +7,7 @@ import { useToggleMealCompletion } from '@/features/calendar/hooks/useToggleMeal
 import { usePlanItems } from '@/features/plans';
 import { calculatePlanTotals } from '@/features/plans/calculations/totals';
 import { useProfile } from '@/features/profile';
+import { useDailyActivitiesTotal } from '@/features/training';
 import { useTheme } from '@/hooks/use-theme';
 import type { Tables } from '@/lib/supabase/database.types';
 
@@ -14,14 +15,16 @@ export type DailyTrackingSectionProps = {
   plan: Tables<'plans'>;
   calendarDayId: string;
   userId: string | undefined;
+  date: string;
 };
 
 /** Meal checklist + consumed-vs-target progress and score for an assigned day. */
-export function DailyTrackingSection({ plan, calendarDayId, userId }: DailyTrackingSectionProps) {
+export function DailyTrackingSection({ plan, calendarDayId, userId, date }: DailyTrackingSectionProps) {
   const theme = useTheme();
   const { data: planItems, isLoading } = usePlanItems(plan.id);
   const { data: completions } = useCalendarDayCompletions(calendarDayId);
   const { data: profile } = useProfile(userId);
+  const { data: caloriesBurned } = useDailyActivitiesTotal(userId, date);
   const toggleCompletion = useToggleMealCompletion(calendarDayId);
 
   if (isLoading) {
@@ -38,7 +41,7 @@ export function DailyTrackingSection({ plan, calendarDayId, userId }: DailyTrack
       .filter((item) => completedIds.has(item.id))
       .flatMap((item) => item.plan_item_foods.map((pif) => ({ food: pif.food, quantity: pif.quantity }))),
   );
-  const targets = plan.is_special
+  const baseTargets = plan.is_special
     ? {
         calories_target: plan.calories_target,
         protein_g_target: plan.protein_g_target,
@@ -51,6 +54,12 @@ export function DailyTrackingSection({ plan, calendarDayId, userId }: DailyTrack
         carbs_g_target: profile?.carbs_g_target ?? null,
         fat_g_target: profile?.fat_g_target ?? null,
       };
+  // Actividad física quemada ese día se suma al objetivo de calorías — el
+  // resto de objetivos (macros) no se tocan, la fórmula no dice nada de ellos.
+  const targets = {
+    ...baseTargets,
+    calories_target: baseTargets.calories_target !== null ? baseTargets.calories_target + caloriesBurned : null,
+  };
 
   return (
     <View style={styles.container}>
@@ -60,7 +69,7 @@ export function DailyTrackingSection({ plan, calendarDayId, userId }: DailyTrack
         pendingId={toggleCompletion.isPending ? toggleCompletion.variables?.planItemId : undefined}
         onToggle={(planItemId, completed) => toggleCompletion.mutate({ planItemId, completed })}
       />
-      <DailyScoreSummary totals={consumedTotals} targets={targets} />
+      <DailyScoreSummary totals={consumedTotals} targets={targets} caloriesBurnedToday={caloriesBurned} />
     </View>
   );
 }

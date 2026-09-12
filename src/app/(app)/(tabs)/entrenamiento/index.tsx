@@ -1,5 +1,5 @@
-import { EntrenamientoHomeScreen } from '@/features/training';
+import { EntrenamientoCalendarScreen } from '@/features/training';
 
 export default function EntrenamientoIndex() {
-  return <EntrenamientoHomeScreen />;
+  return <EntrenamientoCalendarScreen />;
 }

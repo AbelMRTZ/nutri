@@ -45,10 +45,10 @@ export async function upsertCalendarDays(rows: CalendarDayUpsert[]) {
 }
 
 /**
- * Clears one or more fields on a calendar day (e.g. un-assigning a plan or a
- * routine, un-marking free) — an update, never a row delete, because
- * plan/free-day state and routine assignment are independent and can share
- * the same row: removing one must not silently wipe the other.
+ * Clears one or more fields on a calendar day (e.g. un-assigning a plan,
+ * un-marking free) — an update, never a row delete, because plan/free-day
+ * state and a recurring schedule tag are independent and can share the same
+ * row: removing one must not silently wipe the other.
  */
 export async function updateCalendarDay(id: string, updates: TablesUpdate<'calendar_days'>) {
   const { error } = await supabase.from('calendar_days').update(updates).eq('id', id);

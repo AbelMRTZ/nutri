@@ -6,14 +6,12 @@ import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ThemedText } from '@/components/themed-text';
 import { AssignedPlanSummary } from '@/features/calendar/components/AssignedPlanSummary';
-import { AssignedRoutineSummary } from '@/features/calendar/components/AssignedRoutineSummary';
 import { DailyTrackingSection } from '@/features/calendar/components/DailyTrackingSection';
-import { DailyTrainingSection } from '@/features/calendar/components/DailyTrainingSection';
 import { useCalendarDay } from '@/features/calendar/hooks/useCalendarDay';
 import { useMarkDayFree } from '@/features/calendar/hooks/useMarkDayFree';
 import { useUpdateCalendarDay } from '@/features/calendar/hooks/useUpdateCalendarDay';
 import { usePlan } from '@/features/plans';
-import { useRoutine } from '@/features/routines';
+import { ActivitiesDaySummary } from '@/features/training';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDisplayDate, toDateKey } from '@/lib/dates';
 
@@ -22,7 +20,7 @@ export type CalendarDayPanelProps = {
   userId: string | undefined;
 };
 
-type PendingRemoval = 'plan' | 'free' | 'routine' | null;
+type PendingRemoval = 'plan' | 'free' | null;
 
 export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
   const theme = useTheme();
@@ -30,7 +28,6 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
   const dateKey = toDateKey(date);
   const { data: calendarDay, isLoading } = useCalendarDay(userId, dateKey);
   const { data: plan, isLoading: isPlanLoading } = usePlan(calendarDay?.plan_id ?? undefined);
-  const { data: routine, isLoading: isRoutineLoading } = useRoutine(calendarDay?.routine_id ?? undefined);
   const markDayFree = useMarkDayFree(userId);
   const updateCalendarDay = useUpdateCalendarDay(userId);
   const [pendingRemoval, setPendingRemoval] = useState<PendingRemoval>(null);
@@ -39,24 +36,14 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
     router.push({ pathname: '/(app)/(tabs)/calendario/asignar-plan', params: { date: dateKey } });
   }
 
-  function handleAssignRoutine() {
-    router.push({ pathname: '/(app)/(tabs)/calendario/asignar-rutina', params: { date: dateKey } });
-  }
-
   function handleConfirmRemoval() {
     if (!calendarDay || !pendingRemoval) return;
-    const updates =
-      pendingRemoval === 'plan' ? { plan_id: null } : pendingRemoval === 'free' ? { is_free: false } : { routine_id: null };
+    const updates = pendingRemoval === 'plan' ? { plan_id: null } : { is_free: false };
     updateCalendarDay.mutate(
       { id: calendarDay.id, date: dateKey, updates },
       { onSuccess: () => setPendingRemoval(null) },
     );
   }
-
-  const removalCopy =
-    pendingRemoval === 'routine'
-      ? '¿Seguro que quieres quitar la rutina asignada a este día?'
-      : '¿Seguro que quieres quitar la asignación de este día?';
 
   return (
     <View style={styles.flex}>
@@ -96,41 +83,21 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
                 onEdit={() => router.push(`/(app)/(tabs)/despensa/planes/${plan.id}`)}
                 onRemove={() => setPendingRemoval('plan')}
               />
-              <DailyTrackingSection plan={plan} calendarDayId={calendarDay.id} userId={userId} />
+              <DailyTrackingSection plan={plan} calendarDayId={calendarDay.id} userId={userId} date={dateKey} />
             </>
           )}
         </View>
 
         <View style={styles.section}>
           <ThemedText type="smallBold">Entrenamiento del día</ThemedText>
-          {isLoading ? (
-            <ActivityIndicator color={theme.primary} />
-          ) : !calendarDay?.routine_id ? (
-            <View style={styles.actions}>
-              <ThemedText type="default" themeColor="textSecondary">
-                Todavía no has asignado una rutina.
-              </ThemedText>
-              <Button title="Asignar rutina" variant="secondary" onPress={handleAssignRoutine} />
-            </View>
-          ) : isRoutineLoading || !routine ? (
-            <ActivityIndicator color={theme.primary} />
-          ) : (
-            <>
-              <AssignedRoutineSummary
-                routine={routine}
-                onEdit={() => router.push(`/(app)/(tabs)/entrenamiento/rutinas/${routine.id}`)}
-                onRemove={() => setPendingRemoval('routine')}
-              />
-              <DailyTrainingSection routine={routine} calendarDayId={calendarDay.id} />
-            </>
-          )}
+          <ActivitiesDaySummary userId={userId} date={dateKey} />
         </View>
       </ScrollView>
 
       <ConfirmDialog
         visible={pendingRemoval !== null}
         title="Quitar asignación"
-        description={removalCopy}
+        description="¿Seguro que quieres quitar la asignación de este día?"
         confirmLabel="Quitar"
         loading={updateCalendarDay.isPending}
         onConfirm={handleConfirmRemoval}

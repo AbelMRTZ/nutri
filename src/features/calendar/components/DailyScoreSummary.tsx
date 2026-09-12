@@ -9,10 +9,12 @@ import { useTheme } from '@/hooks/use-theme';
 export type DailyScoreSummaryProps = {
   totals: PlanTotals;
   targets: PlanTargets;
+  /** When > 0, shown as a note explaining why the calorie target is higher than the base plan/profile target. */
+  caloriesBurnedToday?: number;
 };
 
 /** Consumed-so-far vs. target progress bars, plus the 0-100 daily score. */
-export function DailyScoreSummary({ totals, targets }: DailyScoreSummaryProps) {
+export function DailyScoreSummary({ totals, targets, caloriesBurnedToday }: DailyScoreSummaryProps) {
   const theme = useTheme();
   const score = calculateDailyScore(totals, targets);
 
@@ -24,6 +26,11 @@ export function DailyScoreSummary({ totals, targets }: DailyScoreSummaryProps) {
           {score === null ? '—' : `${score}/100`}
         </ThemedText>
       </View>
+      {caloriesBurnedToday ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          Incluye {caloriesBurnedToday} kcal quemadas en entrenamiento.
+        </ThemedText>
+      ) : null}
       <PlanProgressSummary totals={totals} targets={targets} />
     </View>
   );

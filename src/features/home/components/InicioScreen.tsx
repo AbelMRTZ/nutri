@@ -4,7 +4,7 @@ import { Screen } from '@/components/screen';
 import { CalendarDayPanel } from '@/features/calendar';
 import { useAuth } from '@/features/auth';
 
-/** Home tab: today's day panel — same plan/routine tracking as Calendario, scoped to today. */
+/** Home tab: today's day panel — same plan/activity tracking as Calendario, scoped to today. */
 export function InicioScreen() {
   const { session } = useAuth();
   const userId = session?.user.id;

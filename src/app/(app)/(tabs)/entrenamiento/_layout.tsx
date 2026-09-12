@@ -9,8 +9,9 @@ export default function EntrenamientoLayout() {
   return (
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="index" options={{ header: () => <TopBar /> }} />
-      <Stack.Screen name="ejercicios" options={{ headerShown: false }} />
-      <Stack.Screen name="rutinas" options={{ headerShown: false }} />
+      <Stack.Screen name="nueva-actividad" options={{ title: 'Nueva actividad' }} />
+      <Stack.Screen name="actividad/[id]" options={{ title: 'Editar actividad' }} />
+      <Stack.Screen name="guardados" options={{ title: 'Entrenos guardados' }} />
     </Stack>
   );
 }
