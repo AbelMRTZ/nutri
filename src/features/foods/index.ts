@@ -1,5 +1,6 @@
 export { FoodsListScreen } from './components/FoodsListScreen';
 export { CreateFoodScreen } from './components/CreateFoodScreen';
+export { ScanBarcodeScreen } from './components/ScanBarcodeScreen';
 export { EditFoodScreen } from './components/EditFoodScreen';
 export { FoodDetailScreen } from './components/FoodDetailScreen';
 export { AlimentosHeaderActions } from './components/AlimentosHeaderActions';

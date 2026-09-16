@@ -33,7 +33,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite el acceso a la cámara para escanear el código de barras de un producto."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

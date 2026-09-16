@@ -7,6 +7,9 @@ export { FoodSubstitutionPickerScreen } from './components/FoodSubstitutionPicke
 export { PlanProgressSummary } from './components/PlanProgressSummary';
 export type { PlanTargets } from './components/PlanProgressSummary';
 export type { PlanItemWithDetails } from './api/planItems';
+export { createPlanInstance, deleteCalendarInstancePlans } from './api/planInstances';
+export type { PlanInstanceForkResult } from './api/planInstances';
+export { deletePlan } from './api/plans';
 export { usePlans } from './hooks/usePlans';
 export { usePlan } from './hooks/usePlan';
 export { useCreatePlan } from './hooks/useCreatePlan';

@@ -141,6 +141,7 @@ export type Database = {
           saturated_fat_g: number | null
           serving_type: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg: number | null
+          source_barcode: string | null
           source_reference_food_id: string | null
           sugar_g: number | null
           updated_at: string
@@ -184,6 +185,7 @@ export type Database = {
           saturated_fat_g?: number | null
           serving_type: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg?: number | null
+          source_barcode?: string | null
           source_reference_food_id?: string | null
           sugar_g?: number | null
           updated_at?: string
@@ -227,6 +229,7 @@ export type Database = {
           saturated_fat_g?: number | null
           serving_type?: Database["public"]["Enums"]["food_serving_type"]
           sodium_mg?: number | null
+          source_barcode?: string | null
           source_reference_food_id?: string | null
           sugar_g?: number | null
           updated_at?: string
@@ -526,6 +529,7 @@ export type Database = {
           created_at: string
           fat_g_target: number | null
           id: string
+          is_calendar_instance: boolean
           is_special: boolean
           name: string
           protein_g_target: number | null
@@ -538,6 +542,7 @@ export type Database = {
           created_at?: string
           fat_g_target?: number | null
           id?: string
+          is_calendar_instance?: boolean
           is_special?: boolean
           name: string
           protein_g_target?: number | null
@@ -550,6 +555,7 @@ export type Database = {
           created_at?: string
           fat_g_target?: number | null
           id?: string
+          is_calendar_instance?: boolean
           is_special?: boolean
           name?: string
           protein_g_target?: number | null

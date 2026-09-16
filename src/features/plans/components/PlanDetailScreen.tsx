@@ -6,6 +6,7 @@ import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ErrorBanner } from '@/components/error-banner';
 import { FullScreenSpinner } from '@/components/full-screen-spinner';
+import { PromptDialog } from '@/components/prompt-dialog';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/features/auth';
@@ -45,6 +46,7 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
   const deletePlan = useDeletePlan(userId);
   const reorderPlanItems = useReorderPlanItems(id);
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const [promoteVisible, setPromoteVisible] = useState(false);
   const [deleteError, setDeleteError] = useState<string | undefined>();
   // Only holds a value while a reorder is in flight — cleared once the
   // mutation settles so the server's own (now-matching) order takes back
@@ -114,6 +116,12 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
   return (
     <View style={styles.root}>
       <Screen scroll style={styles.content}>
+        {plan.is_calendar_instance ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            Estás editando una copia privada de este día. Los cambios no afectarán al plan original.
+          </ThemedText>
+        ) : null}
+
         <PlanForm
           defaultValues={toFormDefaults(plan)}
           onSubmit={handleSubmit}
@@ -123,13 +131,17 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
 
         <PlanProgressSummary totals={totals} targets={targets} />
 
-        <Button
-          variant="secondary"
-          title="Programar en calendario"
-          onPress={() =>
-            router.push({ pathname: '/(app)/(tabs)/despensa/planes/programar-calendario', params: { planId: id } })
-          }
-        />
+        {plan.is_calendar_instance ? (
+          <Button variant="secondary" title="Guardar como nuevo plan" onPress={() => setPromoteVisible(true)} />
+        ) : (
+          <Button
+            variant="secondary"
+            title="Programar en calendario"
+            onPress={() =>
+              router.push({ pathname: '/(app)/(tabs)/despensa/planes/programar-calendario', params: { planId: id } })
+            }
+          />
+        )}
 
         <View style={styles.itemsSection}>
           <View style={styles.itemsHeader}>
@@ -164,7 +176,9 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
           )}
         </View>
 
-        <Button variant="ghost" title="Eliminar plan" onPress={() => setConfirmVisible(true)} />
+        {plan.is_calendar_instance ? null : (
+          <Button variant="ghost" title="Eliminar plan" onPress={() => setConfirmVisible(true)} />
+        )}
 
         <ConfirmDialog
           visible={confirmVisible}
@@ -173,6 +187,22 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
           loading={deletePlan.isPending}
           onConfirm={handleDelete}
           onCancel={() => setConfirmVisible(false)}
+        />
+
+        <PromptDialog
+          visible={promoteVisible}
+          title="Guardar como nuevo plan"
+          label="Nombre"
+          initialValue={`${plan.name} (copia)`}
+          confirmLabel="Guardar"
+          loading={updatePlan.isPending}
+          onConfirm={(name) =>
+            updatePlan.mutate(
+              { name, is_calendar_instance: false },
+              { onSuccess: () => setPromoteVisible(false) },
+            )
+          }
+          onCancel={() => setPromoteVisible(false)}
         />
       </Screen>
 

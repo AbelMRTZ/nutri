@@ -46,6 +46,11 @@ export function FoodDetailScreen({ id }: FoodDetailScreenProps) {
             Importado del catálogo USDA
           </ThemedText>
         ) : null}
+        {food.source_barcode ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            Importado por código de barras (Open Food Facts)
+          </ThemedText>
+        ) : null}
       </View>
 
       <View style={styles.chartRow}>

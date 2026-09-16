@@ -2,7 +2,12 @@ import { supabase } from '@/lib/supabase/client';
 import type { TablesInsert, TablesUpdate } from '@/lib/supabase/database.types';
 
 export async function listPlans(userId: string) {
-  const { data, error } = await supabase.from('plans').select('*').eq('user_id', userId).order('name');
+  const { data, error } = await supabase
+    .from('plans')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_calendar_instance', false)
+    .order('name');
   if (error) throw error;
   return data;
 }

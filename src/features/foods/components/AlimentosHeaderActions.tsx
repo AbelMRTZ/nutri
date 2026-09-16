@@ -33,7 +33,7 @@ export function AlimentosHeaderActions() {
     {
       icon: 'qr-code-outline',
       label: 'Alimento por QR',
-      onPress: () => Alert.alert('Próximamente', 'Añadir un alimento escaneando un código QR estará disponible pronto.'),
+      onPress: () => router.push('/(app)/(tabs)/despensa/alimentos/qr'),
     },
   ];
 

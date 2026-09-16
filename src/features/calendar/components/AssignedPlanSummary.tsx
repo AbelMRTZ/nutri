@@ -8,12 +8,13 @@ import type { Tables } from '@/lib/supabase/database.types';
 
 export type AssignedPlanSummaryProps = {
   plan: Tables<'plans'>;
+  editLoading?: boolean;
   onEdit: () => void;
   onRemove: () => void;
 };
 
 /** Compact card for a plan assigned to a calendar day, with edit/remove actions. */
-export function AssignedPlanSummary({ plan, onEdit, onRemove }: AssignedPlanSummaryProps) {
+export function AssignedPlanSummary({ plan, editLoading, onEdit, onRemove }: AssignedPlanSummaryProps) {
   const theme = useTheme();
 
   return (
@@ -25,7 +26,7 @@ export function AssignedPlanSummary({ plan, onEdit, onRemove }: AssignedPlanSumm
         </ThemedText>
       </View>
       <View style={styles.actions}>
-        <Button variant="secondary" title="Editar" style={styles.flexButton} onPress={onEdit} />
+        <Button variant="secondary" title="Editar" style={styles.flexButton} loading={editLoading} onPress={onEdit} />
         <Button variant="ghost" title="Quitar" style={styles.flexButton} onPress={onRemove} />
       </View>
     </View>

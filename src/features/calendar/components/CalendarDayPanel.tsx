@@ -4,13 +4,15 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ErrorBanner } from '@/components/error-banner';
 import { ThemedText } from '@/components/themed-text';
 import { AssignedPlanSummary } from '@/features/calendar/components/AssignedPlanSummary';
 import { DailyTrackingSection } from '@/features/calendar/components/DailyTrackingSection';
 import { useCalendarDay } from '@/features/calendar/hooks/useCalendarDay';
+import { useEditPlanFromCalendar } from '@/features/calendar/hooks/useEditPlanFromCalendar';
 import { useMarkDayFree } from '@/features/calendar/hooks/useMarkDayFree';
 import { useUpdateCalendarDay } from '@/features/calendar/hooks/useUpdateCalendarDay';
-import { usePlan } from '@/features/plans';
+import { useDeletePlan, usePlan } from '@/features/plans';
 import { ActivitiesDaySummary } from '@/features/training';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDisplayDate, toDateKey } from '@/lib/dates';
@@ -30,18 +32,34 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
   const { data: plan, isLoading: isPlanLoading } = usePlan(calendarDay?.plan_id ?? undefined);
   const markDayFree = useMarkDayFree(userId);
   const updateCalendarDay = useUpdateCalendarDay(userId);
+  const editPlanFromCalendar = useEditPlanFromCalendar(userId);
+  const deletePlan = useDeletePlan(userId);
   const [pendingRemoval, setPendingRemoval] = useState<PendingRemoval>(null);
 
   function handleAssignPlan() {
     router.push({ pathname: '/(app)/(tabs)/calendario/asignar-plan', params: { date: dateKey } });
   }
 
+  function handleEditPlan() {
+    if (!calendarDay || !plan) return;
+    editPlanFromCalendar.mutate(
+      { calendarDayId: calendarDay.id, date: dateKey, currentPlan: plan },
+      { onSuccess: (planId) => router.push(`/(app)/(tabs)/despensa/planes/${planId}`) },
+    );
+  }
+
   function handleConfirmRemoval() {
     if (!calendarDay || !pendingRemoval) return;
     const updates = pendingRemoval === 'plan' ? { plan_id: null } : { is_free: false };
+    const removedInstancePlanId = pendingRemoval === 'plan' && plan?.is_calendar_instance ? plan.id : undefined;
     updateCalendarDay.mutate(
       { id: calendarDay.id, date: dateKey, updates },
-      { onSuccess: () => setPendingRemoval(null) },
+      {
+        onSuccess: () => {
+          setPendingRemoval(null);
+          if (removedInstancePlanId) deletePlan.mutate(removedInstancePlanId);
+        },
+      },
     );
   }
 
@@ -80,7 +98,8 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
             <>
               <AssignedPlanSummary
                 plan={plan}
-                onEdit={() => router.push(`/(app)/(tabs)/despensa/planes/${plan.id}`)}
+                editLoading={editPlanFromCalendar.isPending}
+                onEdit={handleEditPlan}
                 onRemove={() => setPendingRemoval('plan')}
               />
               <DailyTrackingSection plan={plan} calendarDayId={calendarDay.id} userId={userId} date={dateKey} />
@@ -103,6 +122,13 @@ export function CalendarDayPanel({ date, userId }: CalendarDayPanelProps) {
         onConfirm={handleConfirmRemoval}
         onCancel={() => setPendingRemoval(null)}
       />
+
+      {editPlanFromCalendar.isError ? (
+        <ErrorBanner
+          message="No se ha podido editar el plan de este día. Inténtalo de nuevo."
+          onDismiss={() => editPlanFromCalendar.reset()}
+        />
+      ) : null}
     </View>
   );
 }
