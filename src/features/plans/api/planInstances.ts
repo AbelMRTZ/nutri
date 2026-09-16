@@ -68,3 +68,19 @@ export async function deleteCalendarInstancePlans(ids: string[]): Promise<void> 
   const { error } = await supabase.from('plans').delete().in('id', ids).eq('is_calendar_instance', true);
   if (error) throw error;
 }
+
+/**
+ * The single calendar_days row that currently references a plan (by
+ * construction, an is_calendar_instance plan is only ever assigned to
+ * exactly one day — forking always repoints exactly one row, and instances
+ * are filtered out of every plan picker so nothing can assign one to a
+ * second day). Used to know which date's activities should adjust this
+ * instance's targets when editing it directly. A plain query against
+ * calendar_days (not an import from the calendar feature) — plans must
+ * never depend on calendar, since calendar already depends on plans.
+ */
+export async function getCalendarDayDateForPlan(planId: string): Promise<string | null> {
+  const { data, error } = await supabase.from('calendar_days').select('date').eq('plan_id', planId).maybeSingle();
+  if (error) throw error;
+  return data?.date ?? null;
+}

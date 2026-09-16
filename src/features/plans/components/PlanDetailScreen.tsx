@@ -10,12 +10,13 @@ import { PromptDialog } from '@/components/prompt-dialog';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/features/auth';
-import { useProfile } from '@/features/profile';
+import { applyCaloriesBurnedToTargets } from '@/features/calendar/calculations/targets';
 import type { PlanItemWithDetails } from '@/features/plans/api/planItems';
 import { calculatePlanTotals } from '@/features/plans/calculations/totals';
 import { PlanForm } from '@/features/plans/components/PlanForm';
 import { PlanMealGroup } from '@/features/plans/components/PlanMealGroup';
 import { PlanProgressSummary } from '@/features/plans/components/PlanProgressSummary';
+import { useCalendarDayDateForPlan } from '@/features/plans/hooks/useCalendarDayDateForPlan';
 import { useDeletePlan } from '@/features/plans/hooks/useDeletePlan';
 import { usePlan } from '@/features/plans/hooks/usePlan';
 import { usePlanItems } from '@/features/plans/hooks/usePlanItems';
@@ -23,6 +24,8 @@ import { useReorderPlanItems } from '@/features/plans/hooks/useReorderPlanItems'
 import { useUpdatePlan } from '@/features/plans/hooks/useUpdatePlan';
 import { toFormDefaults } from '@/features/plans/mappers';
 import type { PlanFormValues } from '@/features/plans/schema';
+import { useProfile } from '@/features/profile';
+import { useDailyActivitiesTotal } from '@/features/training';
 import { friendlyDeleteErrorMessage } from '@/lib/supabase/errors';
 
 export type PlanDetailScreenProps = {
@@ -42,6 +45,8 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
   const { data: plan, isLoading } = usePlan(id);
   const { data: planItems } = usePlanItems(id);
   const { data: profile } = useProfile(userId);
+  const { data: calendarDate } = useCalendarDayDateForPlan(id, plan?.is_calendar_instance ?? false);
+  const { data: caloriesBurned } = useDailyActivitiesTotal(userId, calendarDate ?? undefined);
   const updatePlan = useUpdatePlan(id, userId);
   const deletePlan = useDeletePlan(userId);
   const reorderPlanItems = useReorderPlanItems(id);
@@ -63,7 +68,7 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
     orderedItems.flatMap((item) => item.plan_item_foods.map((pif) => ({ food: pif.food, quantity: pif.quantity }))),
   );
 
-  const targets = plan.is_special
+  const baseTargets = plan.is_special
     ? {
         calories_target: plan.calories_target,
         protein_g_target: plan.protein_g_target,
@@ -76,6 +81,12 @@ export function PlanDetailScreen({ id }: PlanDetailScreenProps) {
         carbs_g_target: profile?.carbs_g_target ?? null,
         fat_g_target: profile?.fat_g_target ?? null,
       };
+  // Si esta es la instancia de un día del calendario, sus objetivos deben
+  // reflejar el entrenamiento de ese mismo día — mismo cálculo que el panel
+  // del Calendario (DailyTrackingSection), para que nunca diverjan. Para un
+  // plan plantilla normal (no instancia), calendarDate/caloriesBurned se
+  // quedan sin activar y esto es un no-op.
+  const targets = applyCaloriesBurnedToTargets(baseTargets, caloriesBurned ?? 0);
 
   function handleSubmit(values: PlanFormValues) {
     const isSpecial = values.type === 'special';

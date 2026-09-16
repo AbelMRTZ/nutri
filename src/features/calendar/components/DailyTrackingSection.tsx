@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { applyCaloriesBurnedToTargets } from '@/features/calendar/calculations/targets';
 import { DailyScoreSummary } from '@/features/calendar/components/DailyScoreSummary';
 import { MealCompletionList } from '@/features/calendar/components/MealCompletionList';
 import { useCalendarDayCompletions } from '@/features/calendar/hooks/useCalendarDayCompletions';
@@ -54,12 +55,7 @@ export function DailyTrackingSection({ plan, calendarDayId, userId, date }: Dail
         carbs_g_target: profile?.carbs_g_target ?? null,
         fat_g_target: profile?.fat_g_target ?? null,
       };
-  // Actividad física quemada ese día se suma al objetivo de calorías — el
-  // resto de objetivos (macros) no se tocan, la fórmula no dice nada de ellos.
-  const targets = {
-    ...baseTargets,
-    calories_target: baseTargets.calories_target !== null ? baseTargets.calories_target + caloriesBurned : null,
-  };
+  const targets = applyCaloriesBurnedToTargets(baseTargets, caloriesBurned);
 
   return (
     <View style={styles.container}>
