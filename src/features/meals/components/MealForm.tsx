@@ -20,7 +20,7 @@ export type MealFormProps = {
 export function MealForm({ defaultValues, onSubmit, submitLabel = 'Guardar comida', submitting, footer }: MealFormProps) {
   const { control, handleSubmit } = useForm<MealFormValues>({
     resolver: zodResolver(mealFormSchema),
-    defaultValues: { name: '', ...defaultValues },
+    defaultValues: { name: '', recipe_url: '', ...defaultValues },
   });
   // See BasicInfoStep.tsx for why this must be `useFormState`, not
   // `formState` destructured off `useForm()`.
@@ -51,6 +51,23 @@ export function MealForm({ defaultValues, onSubmit, submitLabel = 'Guardar comid
             value={field.value}
             onChange={field.onChange}
             error={errors.category?.message}
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="recipe_url"
+        render={({ field }) => (
+          <TextField
+            label="Enlace a la receta (opcional)"
+            placeholder="https://..."
+            value={field.value}
+            onChangeText={field.onChange}
+            onBlur={field.onBlur}
+            error={errors.recipe_url?.message}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
           />
         )}
       />

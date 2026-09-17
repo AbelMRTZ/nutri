@@ -53,6 +53,36 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+/**
+ * One accent per meal category (Comidas list). Coral/lime reuse the brand
+ * accents; amber reuses `warning`'s hue (breakfast/morning is a natural
+ * fit); violet and magenta are the only two genuinely new hues, chosen to
+ * stay in the same saturated "Vibrante/Enérgico" register. Kept separate
+ * from `Colors` (not just another `ThemeColor` key) deliberately: 1) it's
+ * meal-domain-specific, not a generic app color; 2) `Colors[light|dark]`
+ * must stay a flat string-per-key map — `ThemedText`/`ThemedView` index it
+ * generically via `theme[themeColor]` and a nested object there would
+ * break that. Also deliberately not reusing `danger`/`success` — coloring
+ * a meal category the same red used for delete errors (or green used for
+ * "success") would read as a status, not a category.
+ */
+export const MealCategoryColors = {
+  light: {
+    main: '#FF5A3C',
+    breakfast: '#E8A33D',
+    pre_workout: '#C4F135',
+    post_workout: '#7C5CFC',
+    snack: '#F2419A',
+  },
+  dark: {
+    main: '#FF6B4F',
+    breakfast: '#F5B84F',
+    pre_workout: '#C4F135',
+    post_workout: '#9B85FF',
+    snack: '#FF6BB8',
+  },
+} as const;
+
 /** Space Grotesk for headings/emphasis, Work Sans for body text. */
 export const AppFonts = {
   heading: 'SpaceGrotesk_700Bold',

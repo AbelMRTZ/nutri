@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ThemedText } from '@/components/themed-text';
 import { useDeleteMeal } from '@/features/meals/hooks/useDeleteMeal';
+import { useMealCategoryColor } from '@/features/meals/hooks/useMealCategoryColor';
 import { mealCategoryLabels } from '@/features/meals/schema';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyDeleteErrorMessage } from '@/lib/supabase/errors';
@@ -21,6 +22,7 @@ export function MealListItem({ meal, userId, onDeleteError }: MealListItemProps)
   const theme = useTheme();
   const router = useRouter();
   const deleteMeal = useDeleteMeal(userId);
+  const categoryColor = useMealCategoryColor(meal.category);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   function handleDelete() {
@@ -36,7 +38,7 @@ export function MealListItem({ meal, userId, onDeleteError }: MealListItemProps)
   return (
     <View>
       <Pressable
-        style={[styles.row, { borderColor: theme.border }]}
+        style={[styles.row, { borderColor: theme.border, borderLeftColor: categoryColor }]}
         onPress={() => router.push(`/(app)/(tabs)/despensa/comidas/${meal.id}`)}>
         <View style={styles.info}>
           <ThemedText type="smallBold">{meal.name}</ThemedText>
@@ -72,7 +74,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     paddingVertical: 14,
+    paddingLeft: 12,
     borderBottomWidth: 1,
+    borderLeftWidth: 4,
   },
   info: {
     flex: 1,

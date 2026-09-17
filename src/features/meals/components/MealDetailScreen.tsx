@@ -39,7 +39,7 @@ export function MealDetailScreen({ id }: MealDetailScreenProps) {
   }
 
   function handleSubmit(values: MealFormValues) {
-    updateMeal.mutate(values);
+    updateMeal.mutate({ ...values, recipe_url: values.recipe_url ? values.recipe_url : null });
   }
 
   function handleDelete() {

@@ -8,5 +8,6 @@ export function toFormDefaults(row: Tables<'meals'> | undefined): Partial<MealFo
   return {
     name: row.name,
     category: row.category,
+    recipe_url: row.recipe_url ?? undefined,
   };
 }

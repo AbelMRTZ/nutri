@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { mealCategoryLabels } from '@/features/meals';
@@ -47,6 +47,22 @@ export function MealCompletionList({ items, completedIds, pendingId, onToggle }:
                 {mealCategoryLabels[item.meal.category]}
               </ThemedText>
             </View>
+            {item.meal.recipe_url ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Ver receta"
+                hitSlop={8}
+                style={[styles.recipeButton, { borderColor: theme.accent }]}
+                onPress={(event) => {
+                  event.stopPropagation();
+                  Linking.openURL(item.meal.recipe_url as string);
+                }}>
+                <Ionicons name="play-circle-outline" size={16} color={theme.accent} />
+                <ThemedText type="small" style={{ color: theme.accent }}>
+                  Ver receta
+                </ThemedText>
+              </Pressable>
+            ) : null}
           </Pressable>
         );
       })}
@@ -79,5 +95,14 @@ const styles = StyleSheet.create({
   },
   strikethrough: {
     textDecorationLine: 'line-through',
+  },
+  recipeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderWidth: 1.5,
   },
 });

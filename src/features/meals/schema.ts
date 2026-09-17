@@ -2,7 +2,9 @@ import { z } from 'zod';
 
 export const mealCategoryOptions = ['main', 'breakfast', 'pre_workout', 'post_workout', 'snack'] as const;
 
-export const mealCategoryLabels: Record<(typeof mealCategoryOptions)[number], string> = {
+export type MealCategory = (typeof mealCategoryOptions)[number];
+
+export const mealCategoryLabels: Record<MealCategory, string> = {
   main: 'Principal',
   breakfast: 'Desayuno',
   pre_workout: 'Preentreno',
@@ -13,6 +15,14 @@ export const mealCategoryLabels: Record<(typeof mealCategoryOptions)[number], st
 export const mealFormSchema = z.object({
   name: z.string({ message: 'Indica un nombre' }).trim().min(1, 'Indica un nombre').max(120),
   category: z.enum(mealCategoryOptions, { message: 'Selecciona una categoría' }),
+  recipe_url: z
+    .string()
+    .trim()
+    .max(2048, 'El enlace es demasiado largo')
+    .optional()
+    .refine((value) => !value || /^https?:\/\//i.test(value), {
+      message: 'El enlace debe empezar por http:// o https://',
+    }),
 });
 
 export type MealFormValues = z.infer<typeof mealFormSchema>;
