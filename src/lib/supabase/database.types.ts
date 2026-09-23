@@ -26,7 +26,9 @@ export type Database = {
           date: string
           distance_km: number | null
           duration_minutes: number | null
-          effort_level: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id: string
           met_value: number | null
           name: string | null
@@ -42,7 +44,9 @@ export type Database = {
           date: string
           distance_km?: number | null
           duration_minutes?: number | null
-          effort_level?: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level?:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id?: string
           met_value?: number | null
           name?: string | null
@@ -58,7 +62,9 @@ export type Database = {
           date?: string
           distance_km?: number | null
           duration_minutes?: number | null
-          effort_level?: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level?:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id?: string
           met_value?: number | null
           name?: string | null
@@ -758,7 +764,9 @@ export type Database = {
           created_at: string
           distance_km: number | null
           duration_minutes: number | null
-          effort_level: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id: string
           name: string
           updated_at: string
@@ -771,7 +779,9 @@ export type Database = {
           created_at?: string
           distance_km?: number | null
           duration_minutes?: number | null
-          effort_level?: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level?:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id?: string
           name: string
           updated_at?: string
@@ -784,11 +794,40 @@ export type Database = {
           created_at?: string
           distance_km?: number | null
           duration_minutes?: number | null
-          effort_level?: Database["public"]["Enums"]["activity_effort_level"] | null
+          effort_level?:
+            | Database["public"]["Enums"]["activity_effort_level"]
+            | null
           id?: string
           name?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weight_logs: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number
         }
         Relationships: []
       }
